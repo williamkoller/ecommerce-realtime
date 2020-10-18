@@ -1,0 +1,41 @@
+version: '3'
+services:
+  api:
+    build: .
+    command: sh ./docker-start.sh
+    env_file:
+      - .env
+    environment:
+      ENV_SILENT: "true"
+      DB_CONNECTION: "pg"
+      DB_DATABASE: "${DB_DATABASE}"
+      DB_USER: "${DB_USER}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_PORT: "${DB_PORT}"
+      DB_HOST: "${DB_HOST}"
+      DB_DEBUG: "true"
+      NODE_ENV: 'development'
+
+      HOST: '0.0.0.0'
+      PORT: '3334'
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - 3334:3334
+    depends_on:
+      - db
+    links:
+      - db:db
+  # PostgreSQL
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+      TZ: "GMT"
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./data/postgre/db:/data/db
