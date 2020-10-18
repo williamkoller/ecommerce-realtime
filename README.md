@@ -1,28 +1,48 @@
-# Adonis API application
+### Requisits to run this project
 
-This is the boilerplate for creating an API server in AdonisJs, it comes pre-configured with.
+- Docker
+- Docker-compose
 
-1. Bodyparser
-2. Authentication
-3. CORS
-4. Lucid ORM
-5. Migrations and seeds
+---
 
-## Setup
+<!-- > update /etc/hosts -->
 
-Use the adonis command to install the blueprint
+### Configuring /etc/hosts file
 
-```bash
-adonis new yardstick --api-only
-```
+1. open file
+   - ` sudo nano /etc/hosts` or `sudo vim /etc/hosts`
+2. Add this line at end of file
+   - `127.0.0.1 ecommerce.realtime`
 
-or manually clone the repo and then run `npm install`.
+### To run this project, follow the below steps
 
+1. ##### Build Project
+   - `npm i`
+   - `docker-compose build`
+2. ##### Seed database
+   - `docker-compose run api adonis seed`
+3. ##### Run Project
+   \*`docker-compose up`
 
-### Migrations
+### after completed all steps above, jus click in the link
+[Ecommerce Realtime](http://ecommerce.realtime:3333)
 
-Run the following command to run startup migrations.
+#### Useful commands
 
-```js
-adonis migration:run
-```
+> to access application container just run
+> `docker-compose exec api /bin/sh`
+
+> to run commands inside container just run
+
+`docker-compose exec api <your command> `
+
+> examples
+
+- running adonis seed command
+  `docker-compose exec api adonis seed`
+
+- running adonis migration refresh command
+  `docker-compose exec api adonis migration:refresh`
+
+- running adonis migration refresh and seed command
+  `docker-compose exec api adonis migration:refresh --seed `
