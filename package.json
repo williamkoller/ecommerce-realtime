@@ -5,7 +5,7 @@
   "description": "Adonisjs",
   "main": "index.js",
   "scripts": {
-    "start": "ENV ENV_SILENT=true node server.js",
+    "start": "ENV_SILENT=true node server.js",
     "test": "node ace test",
     "dev": "adonis serve --dev --debug"
   },
