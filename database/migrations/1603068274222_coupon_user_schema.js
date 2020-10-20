@@ -6,9 +6,10 @@ const Schema = use('Schema')
 class CouponUserSchema extends Schema {
   up() {
     this.create('coupon_user', table => {
-      table.increments()
-      table.integer('coupon_id').unsigned()
-      table.integer('user_id').unsigned()
+      table.uuid('id').primary()
+
+      table.uuid('coupon_id').unsigned()
+      table.uuid('user_id').unsigned()
       table.timestamps()
 
       table
