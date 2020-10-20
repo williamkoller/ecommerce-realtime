@@ -6,7 +6,8 @@ const Schema = use('Schema')
 class PasswordResetSchema extends Schema {
   up() {
     this.create('password_resets', table => {
-      table.increments()
+      table.uuid('id').primary()
+
       table.string('email').notNullable()
       table.string('token').notNullable().unique()
 

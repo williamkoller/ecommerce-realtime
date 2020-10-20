@@ -6,10 +6,11 @@ const Schema = use('Schema')
 class CategorySchema extends Schema {
   up() {
     this.create('categories', table => {
-      table.increments()
+      table.uuid('id').primary()
+
       table.string('title', 100)
       table.string('description', 255)
-      table.integer('image_id').unsigned()
+      table.uuid('image_id').unsigned()
       table.timestamps()
 
       table
