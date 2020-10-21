@@ -32,4 +32,4 @@ Route.get('/', () => {
   }
 })
 
-require('./user')
+require('./auth')
