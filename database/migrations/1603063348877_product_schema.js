@@ -40,7 +40,7 @@ class ProductSchema extends Schema {
     })
 
     this.create('category_product', table => {
-      table.increments()
+      table.uuid('id').unique().defaultTo(this.db.raw('uuid_generate_v4()'))
       table.uuid('product_id').unsigned()
       table.uuid('category_id').unsigned()
 
