@@ -30,7 +30,7 @@ Route.get('/', () => {
     version: process.version,
     uptime: uptime,
   }
-})
+}).prefix('v1')
 
 require('./auth')
 require('./admin')
