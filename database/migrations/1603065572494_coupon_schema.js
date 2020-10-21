@@ -6,7 +6,7 @@ const Schema = use('Schema')
 class CouponSchema extends Schema {
   up() {
     this.create('coupons', table => {
-      table.uuid('id').primary()
+      table.uuid('id').unique().defaultTo(this.db.raw('uuid_generate_v4()'))
 
       table.string('code', 100).notNullable()
       table.dateTime('valid_from')
@@ -16,7 +16,9 @@ class CouponSchema extends Schema {
 
       table.enu('type', ['free', 'percent', 'currency']).defaultTo('currency')
       table.boolean('recursive').defaultTo(false)
-      table.timestamps()
+      table.timestamp('created_at', { useTz: true })
+      table.timestamp('updated_at', { useTz: true })
+      table.timestamp('deleted_at', { useTz: true })
     })
   }
 

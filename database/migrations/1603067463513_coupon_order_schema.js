@@ -6,7 +6,7 @@ const Schema = use('Schema')
 class CouponOrderSchema extends Schema {
   up() {
     this.create('coupon_order', table => {
-      table.uuid('id').primary()
+      table.uuid('id').unique().defaultTo(this.db.raw('uuid_generate_v4()'))
 
       table.decimal('total', 12, 2).defaultTo(0.0)
       table.uuid('user_id').unsigned()
@@ -17,8 +17,9 @@ class CouponOrderSchema extends Schema {
         'paid',
         'finished',
       ])
-      table.timestamps()
-
+      table.timestamp('created_at', { useTz: true })
+      table.timestamp('updated_at', { useTz: true })
+      table.timestamp('deleted_at', { useTz: true })
       table
         .foreign('user_id')
         .references('id')

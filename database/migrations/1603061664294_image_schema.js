@@ -6,13 +6,15 @@ const Schema = use('Schema')
 class ImageSchema extends Schema {
   up() {
     this.create('images', table => {
-      table.uuid('id').primary()
+      table.uuid('id').unique().defaultTo(this.db.raw('uuid_generate_v4()'))
 
       table.string('path', 255)
       table.integer('size').unsigned()
       table.string('original_name', 100)
       table.string('extension', 10)
-      table.timestamps()
+      table.timestamp('created_at', { useTz: true })
+      table.timestamp('updated_at', { useTz: true })
+      table.timestamp('deleted_at', { useTz: true })
     })
   }
 

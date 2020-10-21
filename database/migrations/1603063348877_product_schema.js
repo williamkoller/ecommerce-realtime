@@ -6,14 +6,15 @@ const Schema = use('Schema')
 class ProductSchema extends Schema {
   up() {
     this.create('products', table => {
-      table.uuid('id').primary()
+      table.uuid('id').unique().defaultTo(this.db.raw('uuid_generate_v4()'))
 
       table.string('name', 200)
       table.uuid('image_id').unsigned()
       table.text('description')
       table.decimal('price', 12, 2)
-      table.timestamps()
-
+      table.timestamp('created_at', { useTz: true })
+      table.timestamp('updated_at', { useTz: true })
+      table.timestamp('deleted_at', { useTz: true })
       table
         .foreign('image_id')
         .references('id')
