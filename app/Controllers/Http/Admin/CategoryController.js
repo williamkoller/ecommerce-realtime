@@ -1,7 +1,5 @@
 'use strict'
 
-const Response = require('@adonisjs/framework/src/Response')
-
 const Category = use('App/Models/Category')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
@@ -58,7 +56,7 @@ class CategoryController {
       return response.status(201).send(category)
     } catch (error) {
       return response.status(400).send({
-        message: error.message,
+        message: error.message
       })
     }
   }
@@ -91,7 +89,7 @@ class CategoryController {
     category.merge({
       title,
       description,
-      image_id,
+      image_id
     })
     await category.save()
     return response.status(200).send(category)
@@ -117,8 +115,8 @@ class CategoryController {
       await categories.save()
       return response.status(200).send(categories)
     } catch (error) {
-      return response.status(500).send({
-        message: error.message,
+      return response.status(400).send({
+        message: error.message
       })
     }
   }
