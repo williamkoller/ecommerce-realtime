@@ -24,12 +24,18 @@ class CategoryController {
    */
   async index({ request, response, view, pagination }) {
     const title = request.input('title')
-    const query = Category.query()
-    if (title) {
-      query.where('title', 'ILIKE', [`%${title}%`])
+    if (!title) {
+      const categories = await Category.query().paginate(
+        pagination.page,
+        pagination.limit
+      )
+      return response.status(200).send(categories)
     }
-    const categories = await query.paginate(pagination.page, pagination.limit)
-    return response.status(200).send(categories)
+    const query = await Category.query()
+      .where('title', 'ilike', `%${title}%`)
+      .paginate()
+
+    return response.status(200).send(query)
   }
 
   /**
@@ -66,7 +72,9 @@ class CategoryController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show({ params, request, response, view }) {}
+  async show({ params, request, response, view }) {
+    const category = await Category.findOrFail()
+  }
 
   /**
    * Update category details.
