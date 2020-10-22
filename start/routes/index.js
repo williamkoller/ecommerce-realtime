@@ -1,8 +1,8 @@
 'use strict'
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
-
-Route.get('/', () => {
+Route.get('/', 'HomeController.index').namespace('Home')
+Route.get('/v1', () => {
   String.prototype.toHHMMSS = function () {
     var sec_num = parseInt(this, 10) // don't forget the second param
     var hours = Math.floor(sec_num / 3600)
@@ -30,7 +30,7 @@ Route.get('/', () => {
     version: process.version,
     uptime: uptime,
   }
-}).prefix('v1')
+})
 
 require('./auth')
 require('./admin')
