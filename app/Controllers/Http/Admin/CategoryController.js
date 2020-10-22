@@ -1,5 +1,7 @@
 'use strict'
 
+const Response = require('@adonisjs/framework/src/Response')
+
 const Category = use('App/Models/Category')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
@@ -21,11 +23,13 @@ class CategoryController {
    * @param {Object} ctx.pagination
    */
   async index({ request, response, view, pagination }) {
-    const categories = await Category.query().paginate(
-      pagination.page,
-      pagination.limit
-    )
-    return response.send(categories)
+    const title = request.input('title')
+    const query = Category.query()
+    if (title) {
+      query.where('title', 'ILIKE', [`%${title}%`])
+    }
+    const categories = await query.paginate(pagination.page, pagination.limit)
+    return response.status(200).send(categories)
   }
 
   /**
