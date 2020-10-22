@@ -9,11 +9,11 @@ class AuthController {
     const trx = await Database.beginTransaction()
     try {
       const { name, surname, email, password } = request.all()
-      const userFound = await User.query().where('email', email).first()
+      const userFound = await User.findBy({ email })
       if (userFound) {
-        return response
-          .status(400)
-          .send({ message: 'user already registered with this email' })
+        return response.status(400).send({
+          message: `user already registered with this ${userFound.email}`
+        })
       }
       const user = await User.create({ name, surname, email, password }, trx)
 

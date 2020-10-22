@@ -49,9 +49,9 @@ class CategoryController {
       const { title, description, image_id } = request.all()
       const categoryFound = await Category.findBy({ title })
       if (categoryFound)
-        return response
-          .status(400)
-          .send({ message: 'This category already exists' })
+        return response.status(400).send({
+          message: `This category: ${categoryFound.title} already exists`
+        })
       const category = await Category.create({ title, description, image_id })
       return response.status(201).send(category)
     } catch (error) {

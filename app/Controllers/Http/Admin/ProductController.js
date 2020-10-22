@@ -43,7 +43,28 @@ class ProductController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store({ request, response }) {}
+  async store({ request, response }) {
+    try {
+      const { name, image_id, description, price } = request.all()
+      const productFound = await Product.findBy({ name })
+      if (productFound) {
+        return response.status(400).send({
+          message: `This Product: ${productFound.name} already exists`
+        })
+      }
+      const product = await Product.create({
+        name,
+        image_id,
+        description,
+        price
+      })
+      return response.status(201).send(product)
+    } catch (error) {
+      return response.status(400).send({
+        error: error.message
+      })
+    }
+  }
 
   /**
    * Display a single product.
