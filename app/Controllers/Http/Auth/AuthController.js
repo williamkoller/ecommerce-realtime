@@ -9,7 +9,14 @@ class AuthController {
     const trx = await Database.beginTransaction()
     try {
       const { name, surname, email, password } = request.all()
+      const userFound = await User.query().where('email', email).first()
+      if (userFound) {
+        return response
+          .status(400)
+          .send({ message: 'user already registered with this email' })
+      }
       const user = await User.create({ name, surname, email, password }, trx)
+
       const userRole = await Role.findBy('slug', 'client')
       await user.roles().attach([userRole.id], null, trx)
       await trx.commit()
@@ -17,15 +24,14 @@ class AuthController {
     } catch (error) {
       await trx.rollback()
       response.status(400).send({
-        message: 'Error in request register',
-        error,
+        error: error.message
       })
     }
   }
   async login({ request, response, auth }) {
     const { email, password } = request.all()
 
-    let data = await auth.withRefreshToken().attempt(email, password)
+    const data = await auth.withRefreshToken().attempt(email, password)
     return response.send({ data })
   }
   async refresh({ request, response, auth }) {
