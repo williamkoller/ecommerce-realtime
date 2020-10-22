@@ -72,8 +72,9 @@ class CategoryController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show({ params, request, response, view }) {
-    const category = await Category.findOrFail()
+  async show({ params: { id }, request, response, view }) {
+    const category = await Category.findOrFail(id)
+    return response.status(200).send(category)
   }
 
   /**
@@ -94,7 +95,23 @@ class CategoryController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy({ params, request, response }) {}
+  async destroy({ params: { id }, request, response }) {
+    try {
+      const categories = await Category.findOrFail(id)
+      if (categories.deleted_at) {
+        return response
+          .status(400)
+          .send({ message: 'categories found already deleted' })
+      }
+      categories.merge({ deleted_at: new Date() })
+      await categories.save()
+      return response.status(200).send(categories)
+    } catch (error) {
+      return response.status(500).send({
+        message: error.message,
+      })
+    }
+  }
 }
 
 module.exports = CategoryController
