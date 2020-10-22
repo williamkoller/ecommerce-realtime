@@ -30,7 +30,7 @@ class ProductController {
     }
     const query = await Product.query()
       .where('name', 'ilike', `%${name}%`)
-      .paginate(pagination.page, pagination.limit)
+      .paginate()
 
     return response.status(200).send(query)
   }
