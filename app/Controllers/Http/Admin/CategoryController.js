@@ -47,7 +47,7 @@ class CategoryController {
   async store({ request, response }) {
     try {
       const { slug, title, description, image_id } = request.all()
-      const categoryFound = await Category.findBy({ title })
+      const categoryFound = await Category.findByOrFail({ title })
       if (categoryFound)
         return response.status(400).send({
           message: `This category: ${categoryFound.slug} already exists`

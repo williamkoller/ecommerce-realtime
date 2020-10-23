@@ -9,7 +9,7 @@ class AuthController {
     const trx = await Database.beginTransaction()
     try {
       const { name, surname, email, password } = request.all()
-      const userFound = await User.findBy({ email })
+      const userFound = await User.findByOrFail({ email })
       if (userFound) {
         return response.status(400).send({
           message: `user already registered with this ${userFound.email}`
@@ -17,7 +17,7 @@ class AuthController {
       }
       const user = await User.create({ name, surname, email, password }, trx)
 
-      const userRole = await Role.findBy('slug', 'client')
+      const userRole = await Role.findByOrFail('slug', 'client')
       await user.roles().attach([userRole.id], null, trx)
       await trx.commit()
       return response.status(201).send({ data: user })
