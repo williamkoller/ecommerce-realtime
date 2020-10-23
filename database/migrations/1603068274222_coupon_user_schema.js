@@ -5,8 +5,11 @@ const Schema = use('Schema')
 
 class CouponUserSchema extends Schema {
   up() {
-    this.create('coupon_user', table => {
-      table.uuid('id').unique().defaultTo(this.db.raw('uuid_generate_v4()'))
+    this.create('coupon_user', (table) => {
+      table
+        .uuid('id')
+        .unique()
+        .defaultTo(this.db.raw('public.gen_random_uuid()'))
 
       table.uuid('coupon_id').unsigned()
       table.uuid('user_id').unsigned()

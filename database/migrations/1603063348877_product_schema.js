@@ -5,8 +5,11 @@ const Schema = use('Schema')
 
 class ProductSchema extends Schema {
   up() {
-    this.create('products', table => {
-      table.uuid('id').unique().defaultTo(this.db.raw('uuid_generate_v4()'))
+    this.create('products', (table) => {
+      table
+        .uuid('id')
+        .unique()
+        .defaultTo(this.db.raw('public.gen_random_uuid()'))
 
       table.string('name', 200)
       table.uuid('image_id').unsigned()
@@ -22,7 +25,7 @@ class ProductSchema extends Schema {
         .onDelete('cascade')
     })
 
-    this.create('image_product', table => {
+    this.create('image_product', (table) => {
       table.increments()
       table.uuid('image_id').unsigned()
       table.uuid('product_id').unsigned()
@@ -39,8 +42,11 @@ class ProductSchema extends Schema {
         .onDelete('cascade')
     })
 
-    this.create('category_product', table => {
-      table.uuid('id').unique().defaultTo(this.db.raw('uuid_generate_v4()'))
+    this.create('category_product', (table) => {
+      table
+        .uuid('id')
+        .unique()
+        .defaultTo(this.db.raw('public.gen_random_uuid()'))
       table.uuid('product_id').unsigned()
       table.uuid('category_id').unsigned()
 

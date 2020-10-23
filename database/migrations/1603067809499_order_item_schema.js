@@ -5,8 +5,11 @@ const Schema = use('Schema')
 
 class OrderItemSchema extends Schema {
   up() {
-    this.create('order_items', table => {
-      table.uuid('id').unique().defaultTo(this.db.raw('uuid_generate_v4()'))
+    this.create('order_items', (table) => {
+      table
+        .uuid('id')
+        .unique()
+        .defaultTo(this.db.raw('public.gen_random_uuid()'))
 
       table.uuid('product_id').unsigned()
       table.integer('quantity').unsigned()

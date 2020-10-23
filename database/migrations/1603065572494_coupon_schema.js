@@ -5,10 +5,14 @@ const Schema = use('Schema')
 
 class CouponSchema extends Schema {
   up() {
-    this.create('coupons', table => {
-      table.uuid('id').unique().defaultTo(this.db.raw('uuid_generate_v4()'))
+    this.create('coupons', (table) => {
+      table
+        .uuid('id')
+        .unique()
+        .defaultTo(this.db.raw('public.gen_random_uuid()'))
 
       table.string('code', 100).notNullable()
+      table.string('slug').notNullable()
       table.dateTime('valid_from')
       table.dateTime('valid_until')
       table.integer('quantity').defaultTo(1)

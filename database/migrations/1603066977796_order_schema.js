@@ -5,8 +5,11 @@ const Schema = use('Schema')
 
 class OrderSchema extends Schema {
   up() {
-    this.create('orders', table => {
-      table.uuid('id').unique().defaultTo(this.db.raw('uuid_generate_v4()'))
+    this.create('orders', (table) => {
+      table
+        .uuid('id')
+        .unique()
+        .defaultTo(this.db.raw('public.gen_random_uuid()'))
 
       table.decimal('total', 12, 2).defaultTo(0.0)
       table.uuid('user_id').unsigned()
@@ -15,7 +18,7 @@ class OrderSchema extends Schema {
         'cancelled',
         'shipped',
         'paid',
-        'finished',
+        'finished'
       ])
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })

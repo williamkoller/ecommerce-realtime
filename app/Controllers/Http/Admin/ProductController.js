@@ -75,7 +75,10 @@ class ProductController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show({ params, request, response, view }) {}
+  async show({ params: { id }, request, response, view }) {
+    const products = await Product.findOrFail(id)
+    return response.status(200).send(products)
+  }
 
   /**
    * Update product details.
@@ -85,7 +88,18 @@ class ProductController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update({ params, request, response }) {}
+  async update({ params: { id }, request, response }) {
+    const products = await Product.findOrFail(id)
+    const { name, image_id, description, price } = request.all()
+    products.merge({
+      name,
+      image_id,
+      description,
+      price
+    })
+    products.save()
+    return response.status(200).send(products)
+  }
 
   /**
    * Delete a product with id.

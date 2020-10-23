@@ -5,11 +5,16 @@ const Schema = use('Schema')
 
 class ImageSchema extends Schema {
   up() {
-    this.create('images', table => {
-      table.uuid('id').unique().defaultTo(this.db.raw('uuid_generate_v4()'))
+    this.create('images', (table) => {
+      table
+        .uuid('id')
+        .unique()
+        .defaultTo(this.db.raw('public.gen_random_uuid()'))
 
+      table.string('slug').notNullable()
       table.string('path', 255)
       table.integer('size').unsigned()
+      table.string('alt')
       table.string('original_name', 100)
       table.string('extension', 10)
       table.timestamp('created_at', { useTz: true })

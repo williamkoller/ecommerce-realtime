@@ -5,9 +5,13 @@ const Schema = use('Schema')
 
 class CategorySchema extends Schema {
   up() {
-    this.create('categories', table => {
-      table.uuid('id').unique().defaultTo(this.db.raw('uuid_generate_v4()'))
+    this.create('categories', (table) => {
+      table
+        .uuid('id')
+        .unique()
+        .defaultTo(this.db.raw('public.gen_random_uuid()'))
 
+      table.string('slug').notNullable()
       table.string('title', 100)
       table.string('description', 255)
       table.uuid('image_id').unsigned()

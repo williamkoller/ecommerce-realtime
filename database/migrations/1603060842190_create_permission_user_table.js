@@ -4,8 +4,11 @@ const Schema = use('Schema')
 
 class PermissionUserTableSchema extends Schema {
   up() {
-    this.create('permission_user', table => {
-      table.uuid('id').unique().defaultTo(this.db.raw('uuid_generate_v4()'))
+    this.create('permission_user', (table) => {
+      table
+        .uuid('id')
+        .unique()
+        .defaultTo(this.db.raw('public.gen_random_uuid()'))
       table.uuid('permission_id').unsigned().index()
       table
         .foreign('permission_id')

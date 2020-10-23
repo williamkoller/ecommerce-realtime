@@ -4,8 +4,11 @@ const Schema = use('Schema')
 
 class RolesTableSchema extends Schema {
   up() {
-    this.create('roles', table => {
-      table.uuid('id').unique().defaultTo(this.db.raw('uuid_generate_v4()'))
+    this.create('roles', (table) => {
+      table
+        .uuid('id')
+        .unique()
+        .defaultTo(this.db.raw('public.gen_random_uuid()'))
 
       table.string('slug').notNullable().unique()
       table.string('name').notNullable().unique()
