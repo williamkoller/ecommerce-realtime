@@ -46,13 +46,18 @@ class CategoryController {
    */
   async store({ request, response }) {
     try {
-      const { title, description, image_id } = request.all()
+      const { slug, title, description, image_id } = request.all()
       const categoryFound = await Category.findBy({ title })
       if (categoryFound)
         return response.status(400).send({
-          message: `This category: ${categoryFound.title} already exists`
+          message: `This category: ${categoryFound.slug} already exists`
         })
-      const category = await Category.create({ title, description, image_id })
+      const category = await Category.create({
+        slug,
+        title,
+        description,
+        image_id
+      })
       return response.status(201).send(category)
     } catch (error) {
       return response.status(400).send({
@@ -85,8 +90,9 @@ class CategoryController {
    */
   async update({ params: { id }, request, response }) {
     const category = await Category.findOrFail(id)
-    const { title, description, image_id } = request.all()
+    const { slug, title, description, image_id } = request.all()
     category.merge({
+      slug,
       title,
       description,
       image_id
@@ -105,12 +111,11 @@ class CategoryController {
    */
   async destroy({ params: { id }, request, response }) {
     try {
-      const categories = await Category.findOrFail(id)
-      if (categories.deleted_at) {
-        return response
-          .status(400)
-          .send({ message: 'categories found already deleted' })
-      }
+      const categories = await Category.findByOrFail({
+        id: id,
+        deleted_at: null
+      })
+
       categories.merge({ deleted_at: new Date() })
       await categories.save()
       return response.status(200).send(categories)

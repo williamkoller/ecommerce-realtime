@@ -45,14 +45,15 @@ class ProductController {
    */
   async store({ request, response }) {
     try {
-      const { name, image_id, description, price } = request.all()
-      const productFound = await Product.findBy({ name })
+      const { slug, name, image_id, description, price } = request.all()
+      const productFound = await Product.findByOrFail({ slug })
       if (productFound) {
         return response.status(400).send({
-          message: `This Product: ${productFound.name} already exists`
+          message: `This slug: ${productFound.slug} already exists`
         })
       }
       const product = await Product.create({
+        slug,
         name,
         image_id,
         description,
@@ -76,8 +77,14 @@ class ProductController {
    * @param {View} ctx.view
    */
   async show({ params: { id }, request, response, view }) {
-    const products = await Product.findOrFail(id)
-    return response.status(200).send(products)
+    try {
+      const products = await Product.findByOrFail({ id })
+      return response.status(200).send(products)
+    } catch (error) {
+      response.status(400).send({
+        error: error.message
+      })
+    }
   }
 
   /**
@@ -90,8 +97,9 @@ class ProductController {
    */
   async update({ params: { id }, request, response }) {
     const products = await Product.findOrFail(id)
-    const { name, image_id, description, price } = request.all()
+    const { slug, name, image_id, description, price } = request.all()
     products.merge({
+      slug,
       name,
       image_id,
       description,
@@ -109,7 +117,22 @@ class ProductController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy({ params, request, response }) {}
+  async destroy({ params: { id }, request, response }) {
+    try {
+      const products = await Product.findByOrFail({
+        id: id,
+        deleted_at: null
+      })
+
+      products.merge({ deleted_at: new Date() })
+      await products.save()
+      return response.status(200).send(products)
+    } catch (error) {
+      return response.status(400).send({
+        message: error.message
+      })
+    }
+  }
 }
 
 module.exports = ProductController
