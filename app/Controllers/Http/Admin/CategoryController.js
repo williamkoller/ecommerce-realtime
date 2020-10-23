@@ -76,8 +76,14 @@ class CategoryController {
    * @param {View} ctx.view
    */
   async show({ params: { id }, request, response, view }) {
-    const category = await Category.findOrFail(id)
-    return response.status(200).send(category)
+    try {
+      const category = await Category.findByOrFail(id)
+      return response.status(200).send(category)
+    } catch (error) {
+      return response.status(400).send({
+        error: error.message
+      })
+    }
   }
 
   /**
@@ -89,16 +95,22 @@ class CategoryController {
    * @param {Response} ctx.response
    */
   async update({ params: { id }, request, response }) {
-    const category = await Category.findOrFail(id)
-    const { slug, title, description, image_id } = request.all()
-    category.merge({
-      slug,
-      title,
-      description,
-      image_id
-    })
-    await category.save()
-    return response.status(200).send(category)
+    try {
+      const category = await Category.findOrFail(id)
+      const { slug, title, description, image_id } = request.all()
+      category.merge({
+        slug,
+        title,
+        description,
+        image_id
+      })
+      await category.save()
+      return response.status(200).send(category)
+    } catch (error) {
+      return response.status(400).send({
+        error: error.message
+      })
+    }
   }
 
   /**

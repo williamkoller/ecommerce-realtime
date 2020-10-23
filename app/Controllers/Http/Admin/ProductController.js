@@ -96,17 +96,23 @@ class ProductController {
    * @param {Response} ctx.response
    */
   async update({ params: { id }, request, response }) {
-    const products = await Product.findOrFail(id)
-    const { slug, name, image_id, description, price } = request.all()
-    products.merge({
-      slug,
-      name,
-      image_id,
-      description,
-      price
-    })
-    products.save()
-    return response.status(200).send(products)
+    try {
+      const products = await Product.findByOrFail({ id })
+      const { slug, name, image_id, description, price } = request.all()
+      products.merge({
+        slug,
+        name,
+        image_id,
+        description,
+        price
+      })
+      await products.save()
+      return response.status(200).send(products)
+    } catch (error) {
+      return response.status(400).send({
+        error: error.message
+      })
+    }
   }
 
   /**
