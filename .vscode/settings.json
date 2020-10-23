@@ -1,0 +1,14 @@
+{
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "ecommerce-realtime-LOCAL",
+      "database": "ecommerce-realtime",
+      "username": "root",
+      "password": "root"
+    }
+  ]
+}
