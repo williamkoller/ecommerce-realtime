@@ -1,5 +1,7 @@
 'use strict'
 
+const User = use('App/Models/User')
+
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
@@ -17,7 +19,16 @@ class UserController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async index({ request, response, view }) {}
+  async index({ request, response, view }) {
+    try {
+      const users = await User.query().orderBy('name', 'asc').fetch()
+      return response.status(200).send(users)
+    } catch (error) {
+      return response.status(400).send({
+        error: error.message
+      })
+    }
+  }
 
   /**
    * Create/save a new user.
