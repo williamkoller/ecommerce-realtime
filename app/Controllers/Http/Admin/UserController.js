@@ -31,6 +31,8 @@ class UserController {
       }
       const query = await User.query()
         .where('name', 'ilike', `%${name}%`)
+        .orWhere('surname', 'ilike', `%${name}%`)
+        .orWhere('email', 'ilike', `%%${name}`)
         .paginate()
 
       return response.status(200).send(query)
@@ -76,7 +78,16 @@ class UserController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show({ params, request, response, view }) {}
+  async show({ params: { id }, request, response, view }) {
+    try {
+      const users = await User.findOrFail(id)
+      return response.status(200).send({ users })
+    } catch (error) {
+      return response.status(400).send({
+        error: error.message
+      })
+    }
+  }
 
   /**
    * Update user details.
