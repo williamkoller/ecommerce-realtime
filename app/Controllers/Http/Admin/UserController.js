@@ -19,10 +19,21 @@ class UserController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async index({ request, response, view }) {
+  async index({ request, response, view, pagination }) {
     try {
-      const users = await User.query().orderBy('name', 'asc').fetch()
-      return response.status(200).send(users)
+      const name = request.input('name')
+      if (!name) {
+        const users = await User.query().paginate(
+          pagination.page,
+          pagination.limit
+        )
+        return response.status(200).send(users)
+      }
+      const query = await User.query()
+        .where('name', 'ilike', `%${name}%`)
+        .paginate()
+
+      return response.status(200).send(query)
     } catch (error) {
       return response.status(400).send({
         error: error.message
@@ -38,7 +49,23 @@ class UserController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store({ request, response }) {}
+  async store({ request, response }) {
+    try {
+      const { name, surname, email, password } = request.all()
+      const user = await User.findBy({ email })
+      if (user)
+        return response
+          .status(400)
+          .send({ message: `This ${user.email} already exists` })
+      const users = await User.create({ name, surname, email, password })
+
+      return response.status(201).send({ users })
+    } catch (error) {
+      return response.status(400).send({
+        error: error.message
+      })
+    }
+  }
 
   /**
    * Display a single user.
