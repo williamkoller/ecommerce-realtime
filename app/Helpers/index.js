@@ -1,6 +1,7 @@
 'use strict'
 
 const crypto = use('crypto')
+const Helpers = use('Helpers')
 
 /**
  * Generate random string
@@ -25,4 +26,20 @@ const str_random = async (length = 40) => {
   return string
 }
 
-module.exports = { str_random }
+/**
+ * @param { FileJar } file
+ * @param { string } path
+ */
+
+const manage_single_upload = async (file, path = null) => {
+  path = path ? path : Helpers.publicPath('uploads')
+
+  const random_name = await str_random(30)
+  const filename = `${new Date().getTime()}-${random_name}.${file.subType}`
+  await file.move(path, {
+    name: filename
+  })
+  return file
+}
+
+module.exports = { str_random, manage_single_upload }
