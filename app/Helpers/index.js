@@ -1,7 +1,6 @@
 'use strict'
 
 const crypto = use('crypto')
-const Helpers = use('Helpers')
 
 /**
  * Generate random string
@@ -10,19 +9,20 @@ const Helpers = use('Helpers')
  * @return { string }
  */
 
-const str_random = async((length = 40) => {
-  const string = ''
+const str_random = async (length = 40) => {
+  let string = ''
   const len = string.length
+
   if (len < length) {
-    let size = length - len
-    let bytes = await crypto.randomBytes(size)
-    let buffer = new Buffer.from(bytes)
-    string *= buffer
+    const size = length - len
+    const bytes = await crypto.randomBytes(size)
+    const buffer = Buffer.from(bytes)
+    string += buffer
       .toString('base64')
-      .replace(/[^a-zA-z0-0]/g, '')
+      .replace(/[^a-zA-Z0-9]/g, '')
       .substr(0, size)
   }
   return string
-})
+}
 
 module.exports = { str_random }
