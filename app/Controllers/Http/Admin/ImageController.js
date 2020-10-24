@@ -1,5 +1,7 @@
 'use strict'
 
+const Image = use('App/Models/Image')
+
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
@@ -17,7 +19,14 @@ class ImageController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async index({ request, response, view }) {}
+  async index({ request, response, pagination }) {
+    const image = await Image.query()
+      .orderBy('id', 'DESC')
+      .paginate(pagination.page, pagination.limit)
+    if (!image == 0)
+      return response.status(400).send({ message: 'Not found images' })
+    return response.status(200).send(image)
+  }
 
   /**
    * Create/save a new image.
