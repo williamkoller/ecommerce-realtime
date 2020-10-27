@@ -39,7 +39,6 @@ class ImageController {
    */
   async store({ request, response }) {
     try {
-      const { slug } = request.all()
       const fileJar = request.file('images', {
         types: ['image'],
         size: '2mb'
@@ -52,8 +51,7 @@ class ImageController {
             path: file.filename,
             size: file.size,
             original_name: file.clientName,
-            extension: file.subtype,
-            slug
+            extension: file.subtype
           })
 
           images.push(image)
@@ -68,7 +66,6 @@ class ImageController {
       await Promise.all(
         files.successes.map(async (file) => {
           const image = await Image.create({
-            slug,
             path: file.fileName,
             size: file.size,
             original_name: file.clientName,
