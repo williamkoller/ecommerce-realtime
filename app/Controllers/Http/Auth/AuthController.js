@@ -12,7 +12,7 @@ class AuthController {
       const userFound = await User.findByOrFail({ email })
       if (userFound) {
         return response.status(400).send({
-          message: `user already registered with this ${userFound.email}`
+          message: `user already registered`
         })
       }
       const user = await User.create({ name, surname, email, password }, trx)
