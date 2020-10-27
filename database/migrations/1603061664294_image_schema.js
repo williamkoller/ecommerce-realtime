@@ -10,8 +10,6 @@ class ImageSchema extends Schema {
         .uuid('id')
         .unique()
         .defaultTo(this.db.raw('public.gen_random_uuid()'))
-
-      table.string('slug').notNullable()
       table.string('path', 255)
       table.integer('size').unsigned()
       table.string('alt')
