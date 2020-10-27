@@ -13,10 +13,14 @@ class PermissionRoleTableSchema extends Schema {
       table
         .foreign('permission_id')
         .references('id')
-        .on('permissions')
+        .inTable('permissions')
         .onDelete('cascade')
       table.uuid('role_id').unsigned().index()
-      table.foreign('role_id').references('id').on('roles').onDelete('cascade')
+      table
+        .foreign('role_id')
+        .references('id')
+        .inTable('roles')
+        .onDelete('cascade')
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
       table.timestamp('deleted_at', { useTz: true })
