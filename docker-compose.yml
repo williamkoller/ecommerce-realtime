@@ -3,14 +3,17 @@ services:
   api:
     build: .
     command: sh ./docker-start.sh
+    env_file:
+      - .env
     environment:
       ENV_SILENT: 'true'
-      DB_CONNECTION: 'pg'
-      DB_DATABASE: 'ecommerce-realtime'
-      DB_USER: 'root'
-      DB_PASSWORD: 'root'
-      DB_PORT: '5432'
-      DB_HOST: 'db'
+      DB_CONNECTION: ${DB_CONNECTION}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT: ${DB_PORT}
+      DB_HOST: ${DB_HOST}
+      DB_DEBUG: 'true'
 
       NODE_ENV: 'development'
 
@@ -19,14 +22,14 @@ services:
       APP_URL: 'http://0.0.0.0:3333'
 
       CACHE_VIEWS: 'false'
-      APP_KEY: 'hUFcRfJkz3MUSGjWPSF2QUYzvLQnFdVa'
+      APP_KEY: ${APP_KEY}
       HASH_DRIVER: 'bcrypt'
 
     volumes:
       - .:/app
       - /app/node_modules
     ports:
-      - '3333:3333'
+      - ${PORT}:${PORT}
     networks:
       - default
     depends_on:
@@ -35,9 +38,11 @@ services:
       - db:db
   db:
     image: postgres:latest
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: 'ecommerce-realtime'
-      POSTGRES_USER: 'root'
-      POSTGRES_PASSWORD: 'root'
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - 5432:5432
+      - ${DB_PORT}:${DB_PORT}
