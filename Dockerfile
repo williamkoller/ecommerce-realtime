@@ -1,4 +1,4 @@
-FROM node:12.19.0
+FROM node:14.15-alpine3.10
 
 ENV ENV_SILENT=true
 
@@ -8,9 +8,6 @@ COPY . /app
 
 RUN yarn install
 RUN yarn global add @adonisjs/cli nodemon
-
-RUN chown -R node:node /app
-USER node
 
 EXPOSE 3334
 
