@@ -133,7 +133,7 @@ class ImageController {
    */
   async destroy({ params: { id }, request, response }) {
     try {
-      const image = await Image.findOrFail(id)
+      const image = await Image.findOrFail({ id, deleted_at: null })
       image.merge({ deleted_at: new Date() })
       await image.save()
       return response.status(200).send(image)
