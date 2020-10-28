@@ -9,6 +9,6 @@ COPY . /app
 RUN yarn install
 RUN yarn global add @adonisjs/cli nodemon
 
-EXPOSE 3334
+EXPOSE 3333
 
 CMD ["adonis", "serve"]
