@@ -22,6 +22,7 @@ class ImageController {
    */
   async index({ request, response, pagination }) {
     const image = await Image.query()
+      .orWhere({ deleted_at: null })
       .orderBy('id', 'DESC')
       .paginate(pagination.page, pagination.limit)
     if (!image === 0)
@@ -37,46 +38,49 @@ class ImageController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store({ request, response }) {
+  async store({ params: { id }, request, response }) {
     try {
-      const fileJar = request.file('images', {
-        types: ['image'],
-        size: '2mb'
-      })
-      const images = []
-      if (!fileJar.files) {
-        const file = await manage_single_upload(fileJar)
-        if (file.moved()) {
-          const image = await Image.create({
-            path: file.filename,
-            size: file.size,
-            original_name: file.clientName,
-            extension: file.subtype
-          })
+      const img = await Image.findOrFail({ id, deleted_at: null })
+      if (!img) {
+        const fileJar = request.file('images', {
+          types: ['image'],
+          size: '2mb'
+        })
+        const images = []
+        if (!fileJar.files) {
+          const file = await manage_single_upload(fileJar)
+          if (file.moved()) {
+            const image = await Image.create({
+              path: file.filename,
+              size: file.size,
+              original_name: file.clientName,
+              extension: file.subtype
+            })
 
-          images.push(image)
-          return response.status(201).send({ successes: images, error: {} })
+            images.push(image)
+            return response.status(201).send({ successes: images, error: {} })
+          }
+
+          return response.status(400).send({
+            message: 'this image could not be processed at this time'
+          })
         }
-
-        return response.status(400).send({
-          message: 'this image could not be processed at this time'
-        })
-      }
-      const files = await manage_multiple_uploads(fileJar)
-      await Promise.all(
-        files.successes.map(async (file) => {
-          const image = await Image.create({
-            path: file.fileName,
-            size: file.size,
-            original_name: file.clientName,
-            extension: file.subtype
+        const files = await manage_multiple_uploads(fileJar)
+        await Promise.all(
+          files.successes.map(async (file) => {
+            const image = await Image.create({
+              path: file.fileName,
+              size: file.size,
+              original_name: file.clientName,
+              extension: file.subtype
+            })
+            images.push(image)
           })
-          images.push(image)
-        })
-      )
-      return response
-        .status(201)
-        .send({ successes: images, error: files.errors })
+        )
+        return response
+          .status(201)
+          .send({ successes: images, error: files.errors })
+      }
     } catch (error) {
       return response.status(400).send({ error: error.message })
     }
@@ -93,7 +97,7 @@ class ImageController {
    */
   async show({ params: { id }, request, response, view }) {
     try {
-      const images = await Image.findOrFail(id)
+      const images = await Image.findOrFail({ id, deleted_at: null })
       return response.status(200).send(images)
     } catch (error) {
       return response.status(400).send({ error: error.message })
@@ -110,7 +114,7 @@ class ImageController {
    */
   async update({ params: { id }, request, response }) {
     try {
-      const image = await Image.findOrFail(id)
+      const image = await Image.findOrFail({ id, deleted_at: null })
       image.merge(request.only(['original_name']))
       await image.save()
       return response.status(201).send(image)
@@ -127,7 +131,16 @@ class ImageController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy({ params, request, response }) {}
+  async destroy({ params: { id }, request, response }) {
+    try {
+      const image = await Image.findOrFail(id)
+      image.merge({ deleted_at: new Date() })
+      await image.save()
+      return response.status(200).send(image)
+    } catch (error) {
+      return response.status(400).send({ error: error.message })
+    }
+  }
 }
 
 module.exports = ImageController
