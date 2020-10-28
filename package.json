@@ -1,6 +1,6 @@
 {
   "name": "adonis-api-app",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "adonis-version": "4.1.0",
   "description": "Adonisjs",
   "main": "index.js",
