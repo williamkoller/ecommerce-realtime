@@ -1,5 +1,7 @@
 'use strict'
 
+const Coupon = use('App/Models/Coupon')
+
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
@@ -15,9 +17,26 @@ class CouponController {
    * @param {object} ctx
    * @param {Request} ctx.request
    * @param {Response} ctx.response
-   * @param {View} ctx.view
+   * @param {Pagination} pagination
    */
-  async index({ request, response, view }) {}
+  async index({ request, response, pagination }) {
+    try {
+      const code = request.input('code')
+      if (!code) {
+        const coupons = await Coupon.query().paginate(
+          pagination.page,
+          pagination.limit
+        )
+        return response.status(201).send(coupons)
+      }
+      const query = await Coupon.query()
+        .where('code', 'ilike', `%${code}%`)
+        .paginate()
+      return response.status(201).send(query)
+    } catch (error) {
+      return response.status(400).send({ error: error.message })
+    }
+  }
 
   /**
    * Create/save a new coupon.
