@@ -2,6 +2,7 @@
 
 const Coupon = use('App/Models/Coupon')
 const Database = use('Database')
+const Service = use('App/Services/Coupon/CouponService')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
