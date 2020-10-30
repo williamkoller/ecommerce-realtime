@@ -82,7 +82,10 @@ class ImageController {
           .send({ successes: images, error: files.errors })
       }
     } catch (error) {
-      return response.status(400).send({ error: error.message })
+      return response.status(400).send({
+        message: 'This request not performed',
+        error: error.stack
+      })
     }
   }
 
@@ -100,7 +103,10 @@ class ImageController {
       const images = await Image.findOrFail({ id, deleted_at: null })
       return response.status(200).send({ data: images })
     } catch (error) {
-      return response.status(400).send({ error: error.message })
+      return response.status(400).send({
+        message: 'This request not performed',
+        error: error.stack
+      })
     }
   }
 
@@ -119,7 +125,10 @@ class ImageController {
       await image.save()
       return response.status(201).send({ data: image })
     } catch (error) {
-      return response.status(400).send({ error: error.message })
+      return response.status(400).send({
+        message: 'This request not performed',
+        error: error.stack
+      })
     }
   }
 
@@ -138,7 +147,10 @@ class ImageController {
       await image.save()
       return response.status(201).send({ data: image })
     } catch (error) {
-      return response.status(400).send({ error: error.message })
+      return response.status(400).send({
+        message: 'This request not performed',
+        error: error.stack
+      })
     }
   }
 }

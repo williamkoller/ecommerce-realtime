@@ -63,7 +63,8 @@ class CategoryController {
       return response.status(201).send({ data: category })
     } catch (error) {
       return response.status(400).send({
-        message: error.message
+        message: 'This request not performed',
+        error: error.stack
       })
     }
   }
@@ -83,7 +84,8 @@ class CategoryController {
       return response.status(200).send({ data: category })
     } catch (error) {
       return response.status(400).send({
-        error: error.message
+        message: 'This request not performed',
+        error: error.stack
       })
     }
   }
@@ -110,7 +112,8 @@ class CategoryController {
       return response.status(201).send({ data: category })
     } catch (error) {
       return response.status(400).send({
-        error: error.message
+        message: 'This request not performed',
+        error: error.stack
       })
     }
   }
@@ -135,7 +138,8 @@ class CategoryController {
       return response.status(201).send({ data: categories })
     } catch (error) {
       return response.status(400).send({
-        message: error.message
+        message: 'This request not performed',
+        error: error.stack
       })
     }
   }

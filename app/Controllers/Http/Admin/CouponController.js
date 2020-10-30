@@ -36,7 +36,10 @@ class CouponController {
         .paginate()
       return response.status(201).send({ data: query })
     } catch (error) {
-      return response.status(400).send({ error: error.message })
+      return response.status(400).send({
+        message: 'This request not performed',
+        error: error.stack
+      })
     }
   }
 
@@ -100,7 +103,10 @@ class CouponController {
       return response.status(201).send({ data: coupon })
     } catch (error) {
       await trx.rollback()
-      return response.status(400).send({ error: error.message })
+      return response.status(400).send({
+        message: 'This request not performed',
+        error: error.stack
+      })
     }
   }
 
@@ -118,7 +124,10 @@ class CouponController {
       const coupon = await Coupon.findOrFail(id)
       return response.status(200).send({ data: coupon })
     } catch (error) {
-      return response.status(400).send({ error: error.message })
+      return response.status(400).send({
+        message: 'This request not performed',
+        error: error.stack
+      })
     }
   }
 
@@ -147,7 +156,10 @@ class CouponController {
       await coupon.save()
       return response.status(201).send({ data: coupon })
     } catch (error) {
-      return response.status(400).send({ error: error.message })
+      return response.status(400).send({
+        message: 'This request not performed',
+        error: error.stack
+      })
     }
   }
 }

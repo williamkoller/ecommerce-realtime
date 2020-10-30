@@ -37,8 +37,9 @@ class UserController {
 
       return response.status(200).send(query)
     } catch (error) {
-      return response.status(400).send({
-        error: error.message
+     return response.status(400).send({
+        message: 'This request not performed',
+        error: error.stack
       })
     }
   }
@@ -63,8 +64,9 @@ class UserController {
 
       return response.status(201).send({ users })
     } catch (error) {
-      return response.status(400).send({
-        error: error.message
+     return response.status(400).send({
+        message: 'This request not performed',
+        error: error.stack
       })
     }
   }
@@ -83,8 +85,9 @@ class UserController {
       const users = await User.findOrFail({ id, deleted_at: null })
       return response.status(200).send({ data: users })
     } catch (error) {
-      return response.status(400).send({
-        error: error.message
+     return response.status(400).send({
+        message: 'This request not performed',
+        error: error.stack
       })
     }
   }
@@ -110,7 +113,10 @@ class UserController {
       await user.save()
       return response.status(201).send({ data: user })
     } catch (error) {
-      return response.status(400).send({ error: error.message })
+      return response.status(400).send({
+        message: 'This request not performed',
+        error: error.stack
+      })
     }
   }
 
@@ -131,7 +137,10 @@ class UserController {
       await user.save()
       return response.status(201).send({ data: user })
     } catch (error) {
-      return response.status(400).send({ error: error.message })
+      return response.status(400).send({
+        message: 'This request not performed',
+        error: error.stack
+      })
     }
   }
 }
