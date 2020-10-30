@@ -57,7 +57,7 @@ class CouponController {
      */
     try {
       const trx = await Database.beginTransaction()
-      const canUseFor = {
+      const can_user_for = {
         client: false,
         product: false
       }
@@ -73,7 +73,33 @@ class CouponController {
       const { users, products } = request.only(['users', 'products'])
       const coupon = await Coupon.create(CouponData, trx)
       // starts service layer
+      const service = new Service(coupon, trx)
+
+      if (users && users.lenght > 0) {
+        await service.syncUsers(users)
+        can_user_for.client = true
+      }
+
+      if (products && products.length > 0) {
+        await service.syncProducts(products)
+        can_user_for.product = true
+      }
+
+      if (can_user_for.product && can_user_for.client) {
+        coupon.can_user_for = 'product_client'
+      } else if (can_user_for.product && !can_user_for.client) {
+        coupon.can_user_for = 'product'
+      } else if (!can_user_for.product && can_user_for.client) {
+        coupon.can_user_for = 'client'
+      } else {
+        coupon.can_user_for = 'all'
+      }
+
+      await Coupon.save(trx)
+      await trx.commit()
+      return response.status(201).send({ data: coupon })
     } catch (error) {
+      await trx.rollback()
       return response.status(400).send({ error: error.message })
     }
   }
