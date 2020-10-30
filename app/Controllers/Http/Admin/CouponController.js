@@ -1,6 +1,7 @@
 'use strict'
 
 const Coupon = use('App/Models/Coupon')
+const Database = use('Database')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -46,7 +47,35 @@ class CouponController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store({ request, response }) {}
+  async store({ request, response }) {
+    /**
+     * 1 - product - can only be used on specific products
+     * 2 - clients - can only be used by specific customers
+     * 3 - clients and products - can only be used by specific products and customers
+     * 4 - can be used by any customer on any order
+     */
+    try {
+      const trx = await Database.beginTransaction()
+      const canUseFor = {
+        client: false,
+        product: false
+      }
+      const CouponData = request.only([
+        'code',
+        'discount',
+        'valid_from',
+        'valid_util',
+        'quantity',
+        'type',
+        'recursive'
+      ])
+      const { users, products } = request.only(['users', 'products'])
+      const coupon = await Coupon.create(CouponData, trx)
+      // starts service layer
+    } catch (error) {
+      return response.status(400).send({ error: error.message })
+    }
+  }
 
   /**
    * Display a single coupon.
