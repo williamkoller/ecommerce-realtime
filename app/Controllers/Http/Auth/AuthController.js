@@ -22,7 +22,7 @@ class AuthController {
 
       const user = await User.create({ name, surname, email, password }, trx)
 
-      const userRole = await Role.findOrFail('slug', 'client')
+      const userRole = await Role.findBy('slug', 'client')
 
       await user.roles().attach([userRole.id], null, trx)
       await trx.commit()
@@ -31,7 +31,8 @@ class AuthController {
     } catch (error) {
       await trx.rollback()
       response.status(400).send({
-        error: error.message
+        message: 'This request not performed',
+        stack: error.stack
       })
     }
   }
