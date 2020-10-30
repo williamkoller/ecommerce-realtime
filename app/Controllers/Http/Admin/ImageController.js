@@ -22,12 +22,12 @@ class ImageController {
    */
   async index({ request, response, pagination }) {
     const image = await Image.query()
-      .orWhere({ deleted_at: null })
+      .whereNull('deleted_at')
       .orderBy('id', 'DESC')
       .paginate(pagination.page, pagination.limit)
     if (!image === 0)
-      return response.status(400).send({ message: 'Not found images' })
-    return response.status(200).send(image)
+      return response.status(404).send({ message: 'Not found images' })
+    return response.status(200).send({ data: image })
   }
 
   /**
@@ -98,7 +98,7 @@ class ImageController {
   async show({ params: { id }, request, response, view }) {
     try {
       const images = await Image.findOrFail({ id, deleted_at: null })
-      return response.status(200).send(images)
+      return response.status(200).send({ data: images })
     } catch (error) {
       return response.status(400).send({ error: error.message })
     }
@@ -117,7 +117,7 @@ class ImageController {
       const image = await Image.findOrFail({ id, deleted_at: null })
       image.merge(request.only(['original_name']))
       await image.save()
-      return response.status(201).send(image)
+      return response.status(201).send({ data: image })
     } catch (error) {
       return response.status(400).send({ error: error.message })
     }
@@ -136,7 +136,7 @@ class ImageController {
       const image = await Image.findOrFail({ id, deleted_at: null })
       image.merge({ deleted_at: new Date() })
       await image.save()
-      return response.status(200).send(image)
+      return response.status(201).send({ data: image })
     } catch (error) {
       return response.status(400).send({ error: error.message })
     }

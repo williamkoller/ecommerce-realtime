@@ -23,16 +23,16 @@ class UserController {
     try {
       const name = request.input('name')
       if (!name) {
-        const users = await User.query().paginate(
-          pagination.page,
-          pagination.limit
-        )
+        const users = await User.query()
+          .whereNull('deleted_at')
+          .paginate(pagination.page, pagination.limit)
         return response.status(200).send(users)
       }
       const query = await User.query()
         .where('name', 'ilike', `%${name}%`)
         .orWhere('surname', 'ilike', `%${name}%`)
         .orWhere('email', 'ilike', `%%${name}`)
+        .whereNull('deleted_at')
         .paginate()
 
       return response.status(200).send(query)
@@ -54,11 +54,11 @@ class UserController {
   async store({ request, response }) {
     try {
       const { name, surname, email, password } = request.all()
-      const user = await User.findBy({ email })
+      const user = await User.findBy({ email, deleted_at: null })
       if (user)
         return response
-          .status(400)
-          .send({ message: `This ${user.email} already exists` })
+          .status(409)
+          .send({ message: `This user already exists with email` })
       const users = await User.create({ name, surname, email, password })
 
       return response.status(201).send({ users })
@@ -80,8 +80,8 @@ class UserController {
    */
   async show({ params: { id }, request, response, view }) {
     try {
-      const users = await User.findOrFail(id)
-      return response.status(200).send({ users })
+      const users = await User.findOrFail({ id, deleted_at: null })
+      return response.status(200).send({ data: users })
     } catch (error) {
       return response.status(400).send({
         error: error.message
@@ -100,7 +100,7 @@ class UserController {
   async update({ params: { id }, request, response }) {
     try {
       const { name, surname, email, password } = request.all()
-      const user = await User.findOrFail(id)
+      const user = await User.findOrFail({ id, deleted_at: null })
       user.merge({
         name,
         surname,
@@ -108,7 +108,7 @@ class UserController {
         password
       })
       await user.save()
-      return response.status(200).send({ user })
+      return response.status(201).send({ data: user })
     } catch (error) {
       return response.status(400).send({ error: error.message })
     }
@@ -124,12 +124,12 @@ class UserController {
    */
   async destroy({ params: { id }, request, response }) {
     try {
-      const user = await User.findOrFail(id)
+      const user = await User.findOrFail({ id, deleted_at: null })
       user.merge({
         deleted_at: new Date()
       })
       await user.save()
-      return response.status(200).send({ user })
+      return response.status(201).send({ data: user })
     } catch (error) {
       return response.status(400).send({ error: error.message })
     }

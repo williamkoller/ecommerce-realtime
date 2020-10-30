@@ -9,17 +9,24 @@ class AuthController {
     const trx = await Database.beginTransaction()
     try {
       const { name, surname, email, password } = request.all()
-      const userFound = await User.findBy({ email: email })
+      const userFound = await User.query()
+        .where('email', email)
+        .whereNull('deleted_at')
+        .first()
+
       if (userFound) {
         return response.status(409).send({
           message: `user already registered`
         })
       }
+
       const user = await User.create({ name, surname, email, password }, trx)
 
-      const userRole = await Role.findBy('slug', 'client')
+      const userRole = await Role.findOrFail('slug', 'client')
+
       await user.roles().attach([userRole.id], null, trx)
       await trx.commit()
+
       return response.status(201).send({ data: user })
     } catch (error) {
       await trx.rollback()
@@ -48,6 +55,7 @@ class AuthController {
   }
   async logout({ request, response, auth }) {
     let refresh_token = request.input('refresh_token')
+
     if (!refresh_token) {
       refresh_token = request.header('refresh_token')
     }

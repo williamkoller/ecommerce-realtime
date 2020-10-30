@@ -23,17 +23,16 @@ class CategoryController {
   async index({ request, response, view, pagination }) {
     const title = request.input('title')
     if (!title) {
-      const categories = await Category.query().paginate(
-        pagination.page,
-        pagination.limit
-      )
-      return response.status(200).send(categories)
+      const categories = await Category.query()
+        .whereNull('deleted_at')
+        .paginate(pagination.page, pagination.limit)
+      return response.status(200).send({ data: categories })
     }
     const query = await Category.query()
       .where('title', 'ilike', `%${title}%`)
       .paginate()
 
-    return response.status(200).send(query)
+    return response.status(200).send({ data: query })
   }
 
   /**
@@ -47,10 +46,13 @@ class CategoryController {
   async store({ request, response }) {
     try {
       const { slug, title, description, image_id } = request.all()
-      const categoryFound = await Category.findByOrFail({ title })
+      const categoryFound = await Category.findByOrFail({
+        title,
+        deleted_at: null
+      })
       if (categoryFound)
-        return response.status(400).send({
-          message: `This category: ${categoryFound.slug} already exists`
+        return response.status(409).send({
+          message: `This category already exists`
         })
       const category = await Category.create({
         slug,
@@ -58,7 +60,7 @@ class CategoryController {
         description,
         image_id
       })
-      return response.status(201).send(category)
+      return response.status(201).send({ data: category })
     } catch (error) {
       return response.status(400).send({
         message: error.message
@@ -77,8 +79,8 @@ class CategoryController {
    */
   async show({ params: { id }, request, response, view }) {
     try {
-      const category = await Category.findByOrFail(id)
-      return response.status(200).send(category)
+      const category = await Category.findByOrFail({ id, deleted_at: null })
+      return response.status(200).send({ data: category })
     } catch (error) {
       return response.status(400).send({
         error: error.message
@@ -96,7 +98,7 @@ class CategoryController {
    */
   async update({ params: { id }, request, response }) {
     try {
-      const category = await Category.findOrFail(id)
+      const category = await Category.findOrFail({ id, deleted_at: null })
       const { slug, title, description, image_id } = request.all()
       category.merge({
         slug,
@@ -105,7 +107,7 @@ class CategoryController {
         image_id
       })
       await category.save()
-      return response.status(200).send(category)
+      return response.status(201).send({ data: category })
     } catch (error) {
       return response.status(400).send({
         error: error.message
@@ -130,7 +132,7 @@ class CategoryController {
 
       categories.merge({ deleted_at: new Date() })
       await categories.save()
-      return response.status(200).send(categories)
+      return response.status(201).send({ data: categories })
     } catch (error) {
       return response.status(400).send({
         message: error.message
