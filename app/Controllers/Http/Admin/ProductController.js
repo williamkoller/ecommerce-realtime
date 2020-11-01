@@ -63,7 +63,7 @@ class ProductController {
       })
       return response.status(201).send({ data: product })
     } catch (error) {
-     return response.status(400).send({
+      return response.status(400).send({
         message: 'This request not performed',
         error: error.stack
       })
@@ -110,9 +110,9 @@ class ProductController {
         price
       })
       await products.save()
-      return response.status(201).send({ data: products })
+      return response.status(200).send({ data: products })
     } catch (error) {
-     return response.status(400).send({
+      return response.status(400).send({
         message: 'This request not performed',
         error: error.stack
       })

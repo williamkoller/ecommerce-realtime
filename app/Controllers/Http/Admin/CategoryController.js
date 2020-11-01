@@ -109,7 +109,7 @@ class CategoryController {
         image_id
       })
       await category.save()
-      return response.status(201).send({ data: category })
+      return response.status(200).send({ data: category })
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',
