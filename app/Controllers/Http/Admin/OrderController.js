@@ -1,6 +1,7 @@
 'use strict'
 
 const Order = use('App/Models/Order')
+const Service = use('App/Service/Order/Service')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -52,7 +53,25 @@ class OrderController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store({ request, response }) {}
+  async store({ request, response }) {
+    try {
+      const trx = await Database.beginTransaction()
+      const { user_id, items, status } = request.all()
+      const order = await Order.create({ user_id, items, status })
+      const service = new Service(order, trx)
+      if (items && items.length > 0) {
+        await service.syncItems(items)
+      }
+      await trx.commit()
+      return response.status(201).send({ data: order })
+    } catch (error) {
+      await trx.rollback()
+      return response.status(400).send({
+        message: 'This request not performed',
+        error: error.stack
+      })
+    }
+  }
 
   /**
    * Display a single order.
