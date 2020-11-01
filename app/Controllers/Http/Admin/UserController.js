@@ -135,7 +135,7 @@ class UserController {
         deleted_at: new Date()
       })
       await user.save()
-      return response.status(201).send({ data: user })
+      return response.status(200).send({ data: user })
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',

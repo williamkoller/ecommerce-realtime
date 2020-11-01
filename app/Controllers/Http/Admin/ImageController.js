@@ -145,7 +145,7 @@ class ImageController {
       const image = await Image.findOrFail({ id, deleted_at: null })
       image.merge({ deleted_at: new Date() })
       await image.save()
-      return response.status(201).send({ data: image })
+      return response.status(200).send({ data: image })
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',

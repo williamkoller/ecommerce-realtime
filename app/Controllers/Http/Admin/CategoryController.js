@@ -135,7 +135,7 @@ class CategoryController {
 
       categories.merge({ deleted_at: new Date() })
       await categories.save()
-      return response.status(201).send({ data: categories })
+      return response.status(200).send({ data: categories })
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',

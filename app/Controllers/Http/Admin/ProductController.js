@@ -136,7 +136,7 @@ class ProductController {
 
       products.merge({ deleted_at: new Date() })
       await products.save()
-      return response.status(201).send(products)
+      return response.status(200).send(products)
     } catch (error) {
       return response.status(400).send({
         message: error.message

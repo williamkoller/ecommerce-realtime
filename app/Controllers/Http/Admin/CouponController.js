@@ -208,7 +208,7 @@ class CouponController {
       const coupon = await Coupon.findOrFail({ id, deleted_at: null })
       coupon.merge({ deleted_at: new Date() })
       await coupon.save()
-      return response.status(201).send({ data: coupon })
+      return response.status(200).send({ data: coupon })
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',
