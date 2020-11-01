@@ -139,7 +139,61 @@ class CouponController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update({ params, request, response }) {}
+  async update({ params: { id }, request, response }) {
+    try {
+      const trx = await Database.beginTransaction()
+      const coupon = await Coupon.findOrFail(id)
+      const can_user_for = {
+        client: false,
+        product: false
+      }
+      const CouponData = request.only([
+        'code',
+        'discount',
+        'valid_from',
+        'valid_util',
+        'quantity',
+        'type',
+        'recursive'
+      ])
+      coupon.merge(CouponData)
+
+      const { users, products } = request.only(['users', 'products'])
+
+      const service = new Service(coupon, trx)
+
+      if (users && users.lenght > 0) {
+        await service.syncUsers(users)
+        can_user_for.client = true
+      }
+
+      if (products && products.length > 0) {
+        await service.syncProducts(products)
+        can_user_for.product = true
+      }
+
+      if (can_user_for.product && can_user_for.client) {
+        coupon.can_user_for = 'product_client'
+      } else if (can_user_for.product && !can_user_for.client) {
+        coupon.can_user_for = 'product'
+      } else if (!can_user_for.product && can_user_for.client) {
+        coupon.can_user_for = 'client'
+      } else {
+        coupon.can_user_for = 'all'
+      }
+
+      await coupon.save(trx)
+      await trx.commit()
+
+      return response.status(200).send({ data: coupon })
+    } catch (error) {
+      await trx.rollback()
+      return response.status(400).send({
+        message: 'This request not performed',
+        error: error.stack
+      })
+    }
+  }
 
   /**
    * Delete a coupon with id.
