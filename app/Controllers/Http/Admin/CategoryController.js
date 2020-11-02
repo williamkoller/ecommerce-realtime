@@ -1,6 +1,7 @@
 'use strict'
 
 const Category = use('App/Models/Category')
+const Transformer = use('App/Transformers/Admin/CategoryTransformer')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -20,19 +21,31 @@ class CategoryController {
    * @param {View} ctx.view
    * @param {Object} ctx.pagination
    */
-  async index({ request, response, view, pagination }) {
-    const title = request.input('title')
-    if (!title) {
-      const categories = await Category.query()
-        .whereNull('deleted_at')
-        .paginate(pagination.page, pagination.limit)
-      return response.status(200).send(categories)
-    }
-    const query = await Category.query()
-      .where('title', 'ilike', `%${title}%`)
-      .paginate()
+  async index({ request, response, transform, pagination }) {
+    try {
+      const title = request.input('title')
+      if (!title) {
+        let categories = await Category.query().paginate(
+          pagination.page,
+          pagination.limit
+        )
 
-    return response.status(200).send(query)
+        categories = await transform.paginate(categories, Transformer)
+        return response.status(200).send(categories)
+      }
+      let query = await Category.query()
+        .where('title', 'ilike', `%${title}%`)
+        .paginate()
+
+      query = await transform.paginate(query, Transformer)
+
+      return response.status(200).send(query)
+    } catch (error) {
+      return response.status(400).send({
+        message: 'This request not performed',
+        error: error.stack
+      })
+    }
   }
 
   /**
