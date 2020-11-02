@@ -102,7 +102,30 @@ class OrderController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update({ params, request, response }) {}
+  async update({ params: { id }, request, response }) {
+    try {
+      const order = await Order.findOrFail(id)
+      const trx = await Database.beginTransaction()
+      const { user_id, items, status } = request.all()
+
+      order.merge({
+        user_id,
+        status
+      })
+      const service = await new Service(order, trx)
+      service.syncUpdateItems(items)
+      await order.save(trx)
+      await trx.commit()
+
+      return response.status(200).send({ data: order })
+    } catch (error) {
+      await trx.rollback()
+      return response.status(400).send({
+        message: 'This request not performed',
+        error: error.stack
+      })
+    }
+  }
 
   /**
    * Delete a order with id.
