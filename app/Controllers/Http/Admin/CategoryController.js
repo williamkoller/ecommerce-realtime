@@ -18,7 +18,7 @@ class CategoryController {
    * @param {object} ctx
    * @param {Request} ctx.request
    * @param {Response} ctx.response
-   * @param {View} ctx.view
+   * @param {TransformWith} ctx.transform
    * @param {Object} ctx.pagination
    */
   async index({ request, response, transform, pagination }) {
@@ -56,22 +56,20 @@ class CategoryController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store({ request, response }) {
+  async store({ request, response, transform }) {
     try {
       const { title, description, image_id } = request.all()
-      const categoryFound = await Category.findByOrFail({
-        title,
-        deleted_at: null
-      })
+      const categoryFound = await Category.findBy({ title, deleted_at: null })
       if (categoryFound)
         return response.status(409).send({
           message: `This category already exists`
         })
-      const category = await Category.create({
+      let category = await Category.create({
         title,
         description,
         image_id
       })
+      category = await transform.item(category, Transformer)
       return response.status(201).send({ data: category })
     } catch (error) {
       return response.status(400).send({
@@ -88,11 +86,12 @@ class CategoryController {
    * @param {object} ctx
    * @param {Request} ctx.request
    * @param {Response} ctx.response
-   * @param {View} ctx.view
+   * @param {TransformWith} ctx.transform
    */
-  async show({ params: { id }, request, response, view }) {
+  async show({ params: { id }, request, response, transform }) {
     try {
-      const category = await Category.findByOrFail({ id, deleted_at: null })
+      let category = await Category.findByOrFail({ id, deleted_at: null })
+      category = await transform.item(category, Transformer)
       return response.status(200).send({ data: category })
     } catch (error) {
       return response.status(400).send({
@@ -110,9 +109,9 @@ class CategoryController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update({ params: { id }, request, response }) {
+  async update({ params: { id }, request, response, transform }) {
     try {
-      const category = await Category.findOrFail({ id, deleted_at: null })
+      let category = await Category.findOrFail({ id, deleted_at: null })
       const { title, description, image_id } = request.all()
       category.merge({
         title,
@@ -120,6 +119,7 @@ class CategoryController {
         image_id
       })
       await category.save()
+      category = await transform.item(category, Transformer)
       return response.status(200).send({ data: category })
     } catch (error) {
       return response.status(400).send({
@@ -137,15 +137,16 @@ class CategoryController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy({ params: { id }, request, response }) {
+  async destroy({ params: { id }, request, response, transform }) {
     try {
-      const categories = await Category.findByOrFail({
+      let categories = await Category.findByOrFail({
         id: id,
         deleted_at: null
       })
 
       categories.merge({ deleted_at: new Date() })
       await categories.save()
+      categories = await transform.item(categories, Transformer)
       return response.status(200).send({ data: categories })
     } catch (error) {
       return response.status(400).send({
