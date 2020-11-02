@@ -10,24 +10,32 @@ Router.group(() => {
   Router.post('/register', 'AuthController.register')
     .as('auth.register')
     .middleware(['guest'])
+    .validator('Auth/Register')
+
   Router.post('/login', 'AuthController.login')
     .as('auth.login')
     .middleware(['guest'])
+    .validator('Auth/Login')
+
   Router.post('/refresh', 'AuthController.refresh')
     .as('auth.refresh')
     .middleware(['guest'])
+
   Router.post('/logout', 'AuthController.logout')
     .as('auth.logout')
     .middleware(['auth'])
+
   /**
    * restore password routes
    */
   Router.post('/reset-password', 'AuthController.forgot')
     .as('auth.forgot')
     .middleware(['guest'])
+
   Router.get('/reset-password', 'AuthController.remember')
     .as('auth.remember')
     .middleware(['guest'])
+
   Router.put('/reset-password', 'AuthController.reset')
     .as('auth.reset')
     .middleware(['guest'])
