@@ -43,6 +43,19 @@ class OrderService {
 
   // check if the coupon not is associated with specific products and customers
   async canApplyDiscount(coupon) {
+    // verify a validate for date
+    const now = new Date().getTime()
+    if (
+      now > coupon.valid_from.getTime() ||
+      (typeof coupon.valid_until == 'object' &&
+        coupon.valid_until.getTime() < now)
+    ) {
+      // checks if the coupon is already valid
+      // checks for an expiration date
+      // if there is an expiration date, check if the coupon has expired
+      return false
+    }
+
     const couponProducts = await Database.from('coupon_products')
       .where('coupon_id', coupon.id)
       .pluck('product_id')
