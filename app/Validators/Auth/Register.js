@@ -13,7 +13,7 @@ class Register {
   get messages() {
     return {
       'name.required': 'The name is required!',
-      'surname.required': 'The surnameis required!',
+      'surname.required': 'The surname is required!',
       'email.required': 'The e-mail is required',
       'email.email': 'The e-mail invalid',
       'email.unique': 'This e-mail already exists',
