@@ -30,7 +30,9 @@ Router.group(() => {
    */
   Router.post('orders/:id/discount', 'OrderController.applyDiscount')
   Router.delete('orders/:id/discount', 'OrderController.removeDiscount')
-  Router.resource('orders', 'OrderController').apiOnly()
+  Router.resource('orders', 'OrderController')
+    .apiOnly()
+    .validator(new Map([[['orders.store'], ['Admin/StoreOrder']]]))
   /**
    * Products resource routes
    */
