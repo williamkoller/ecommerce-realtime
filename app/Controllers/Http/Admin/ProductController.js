@@ -44,18 +44,16 @@ class ProductController {
    */
   async store({ request, response }) {
     try {
-      const { slug, name, image_id, description, price } = request.all()
+      const { name, image_id, description, price } = request.all()
       const productFound = await Product.findByOrFail({
-        slug,
         deleted_at: null
       })
       if (productFound) {
         return response.status(409).send({
-          message: `This slug already exists`
+          message: `This product not exists`
         })
       }
       const product = await Product.create({
-        slug,
         name,
         image_id,
         description,
@@ -101,9 +99,8 @@ class ProductController {
   async update({ params: { id }, request, response }) {
     try {
       const products = await Product.findByOrFail({ id, deleted_at: null })
-      const { slug, name, image_id, description, price } = request.all()
+      const { name, image_id, description, price } = request.all()
       products.merge({
-        slug,
         name,
         image_id,
         description,

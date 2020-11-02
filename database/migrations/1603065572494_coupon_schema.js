@@ -12,7 +12,6 @@ class CouponSchema extends Schema {
         .defaultTo(this.db.raw('public.gen_random_uuid()'))
 
       table.string('code', 100).notNullable()
-      table.string('slug').notNullable()
       table.dateTime('valid_from')
       table.dateTime('valid_until')
       table.integer('quantity').defaultTo(1)

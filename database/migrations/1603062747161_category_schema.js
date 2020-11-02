@@ -11,7 +11,6 @@ class CategorySchema extends Schema {
         .unique()
         .defaultTo(this.db.raw('public.gen_random_uuid()'))
 
-      table.string('slug').notNullable()
       table.string('title', 100)
       table.string('description', 255)
       table.uuid('image_id').unsigned()

@@ -12,7 +12,6 @@ class ProductSchema extends Schema {
         .defaultTo(this.db.raw('public.gen_random_uuid()'))
 
       table.string('name', 200)
-      table.string('slug').notNullable()
       table.uuid('image_id').unsigned()
       table.text('description')
       table.decimal('price', 12, 2)

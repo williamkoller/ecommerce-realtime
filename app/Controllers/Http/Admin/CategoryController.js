@@ -45,7 +45,7 @@ class CategoryController {
    */
   async store({ request, response }) {
     try {
-      const { slug, title, description, image_id } = request.all()
+      const { title, description, image_id } = request.all()
       const categoryFound = await Category.findByOrFail({
         title,
         deleted_at: null
@@ -55,7 +55,6 @@ class CategoryController {
           message: `This category already exists`
         })
       const category = await Category.create({
-        slug,
         title,
         description,
         image_id
@@ -101,9 +100,8 @@ class CategoryController {
   async update({ params: { id }, request, response }) {
     try {
       const category = await Category.findOrFail({ id, deleted_at: null })
-      const { slug, title, description, image_id } = request.all()
+      const { title, description, image_id } = request.all()
       category.merge({
-        slug,
         title,
         description,
         image_id
