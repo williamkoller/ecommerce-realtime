@@ -45,14 +45,6 @@ class ProductController {
   async store({ request, response }) {
     try {
       const { name, image_id, description, price } = request.all()
-      const productFound = await Product.findByOrFail({
-        deleted_at: null
-      })
-      if (productFound) {
-        return response.status(409).send({
-          message: `This product not exists`
-        })
-      }
       const product = await Product.create({
         name,
         image_id,
