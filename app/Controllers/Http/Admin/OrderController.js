@@ -1,7 +1,7 @@
 'use strict'
 
 const Order = use('App/Models/Order')
-const Service = use('App/Service/Order/Service')
+const Service = use('App/Services/Order/OrderService')
 const Coupon = use('App/Models/Coupon')
 const Discount = use('App/Models/Discount')
 
@@ -28,15 +28,14 @@ class OrderController {
 
       const query = Order.query()
       if (status && id) {
-        query.where('status', status)
-        query.orWhere('id', 'ILIKE', `${id}`)
+        query.where('status', status).orWhere('id', 'ILIKE', `${id}`)
       } else if (status) {
         query.where('status', status)
       } else if (id) {
         query.where('id', 'ILIKE', `${id}`)
       }
 
-      const coupons = query.paginate(pagination.page, pagination.limit)
+      const coupons = await query.paginate(pagination.page, pagination.limit)
 
       return response.status(200).send({ data: coupons })
     } catch (error) {

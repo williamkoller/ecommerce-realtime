@@ -26,13 +26,13 @@ class CategoryController {
       const categories = await Category.query()
         .whereNull('deleted_at')
         .paginate(pagination.page, pagination.limit)
-      return response.status(200).send({ data: categories })
+      return response.status(200).send(categories)
     }
     const query = await Category.query()
       .where('title', 'ilike', `%${title}%`)
       .paginate()
 
-    return response.status(200).send({ data: query })
+    return response.status(200).send(query)
   }
 
   /**
