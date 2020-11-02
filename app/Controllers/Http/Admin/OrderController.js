@@ -2,6 +2,8 @@
 
 const Order = use('App/Models/Order')
 const Service = use('App/Service/Order/Service')
+const Coupon = use('App/Models/Coupon')
+const Discount = use('App/Models/Discount')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -143,6 +145,74 @@ class OrderController {
       })
       await coupons.save()
       return response.status(200).send({ data: coupons })
+    } catch (error) {
+      return response.status(400).send({
+        message: 'This request not performed',
+        error: error.stack
+      })
+    }
+  }
+  /**
+   *
+   * @param {*} { params: { id }, request, response }
+   * @memberof OrderController
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   */
+  async applyDiscount({ params: { id }, request, response }) {
+    try {
+      const { code } = request.all()
+      const coupon = await Coupon.findByOrFail('code', code.toUpperCase())
+      const order = await Order.findOrFail(id)
+
+      const info = {}
+
+      const service = new Service(order)
+      const canAddDiscount = await service.canApplyDiscount(coupon)
+      const orderDiscounts = await order.coupons().getCount()
+
+      const canApplyToOrder =
+        orderDiscounts < 1 || (orderDiscounts >= 1 && coupon.recursive)
+
+      if (canAddDiscount && canApplyToOrder) {
+        Object.assign(
+          {},
+          await Discount.findOrCreate({
+            order_id: order.id,
+            coupon_id: coupon.id
+          })
+        )
+
+        info.message = 'Coupon successfully applied'
+        info.success = true
+      } else {
+        info.message = 'This coupon could not be applied'
+        info.success = false
+      }
+
+      return response.status(200).send({ order, info })
+    } catch (error) {
+      return response.status(400).send({
+        message: 'Error coupon clould not be apllied',
+        error: error.stack
+      })
+    }
+  }
+
+  /**
+   * @param {object} ctx
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   */
+  async removeDiscount({ request, response }) {
+    try {
+      const { discount_id } = request.all()
+      const discount = await Discount.findOrFail(discount_id)
+      discount.merge({ deleted_at: new Date() })
+      await discount.save()
+
+      return response.status(200).send({ data: discount })
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',
