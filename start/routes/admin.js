@@ -9,7 +9,14 @@ Router.group(() => {
   /**
    * Categories resource routes
    */
-  Router.resource('categories', 'CategoryController').apiOnly()
+  Router.resource('categories', 'CategoryController')
+    .apiOnly()
+    .validator(
+      new Map([
+        [['categories.store'], ['Admin/StoreCategory']],
+        [['categories.update'], ['Admin/StoreCategory']]
+      ])
+    )
   /**
    * Coupon resource routes
    */
