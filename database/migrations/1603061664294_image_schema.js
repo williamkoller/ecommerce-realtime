@@ -12,7 +12,6 @@ class ImageSchema extends Schema {
         .defaultTo(this.db.raw('public.gen_random_uuid()'))
       table.string('path', 255)
       table.integer('size').unsigned()
-      table.string('alt')
       table.string('original_name', 100)
       table.string('extension', 10)
       table.timestamp('created_at', { useTz: true })
