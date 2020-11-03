@@ -1,6 +1,7 @@
 'use strict'
 
 const User = use('App/Models/User')
+const Transformer = use('App/Transformers/Admin/UserTransformer')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -17,23 +18,27 @@ class UserController {
    * @param {object} ctx
    * @param {Request} ctx.request
    * @param {Response} ctx.response
-   * @param {View} ctx.view
+   * @param {TransformWith} ctx.transform
    */
-  async index({ request, response, view, pagination }) {
+  async index({ request, response, transform, pagination }) {
     try {
       const name = request.input('name')
       if (!name) {
-        const users = await User.query()
+        let users = await User.query()
           .whereNull('deleted_at')
           .paginate(pagination.page, pagination.limit)
+
+        users = await transform.paginate(users, Transformer)
         return response.status(200).send(users)
       }
-      const query = await User.query()
+      let query = await User.query()
         .where('name', 'ilike', `%${name}%`)
         .orWhere('surname', 'ilike', `%${name}%`)
         .orWhere('email', 'ilike', `%%${name}`)
         .whereNull('deleted_at')
         .paginate()
+
+      query = await transform.paginate(query, Transformer)
 
       return response.status(200).send(query)
     } catch (error) {
@@ -52,7 +57,7 @@ class UserController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store({ request, response }) {
+  async store({ request, response, transform }) {
     try {
       const { name, surname, email, password } = request.all()
       const user = await User.findBy({ email, deleted_at: null })
@@ -60,8 +65,9 @@ class UserController {
         return response
           .status(409)
           .send({ message: `This user already exists with email` })
-      const users = await User.create({ name, surname, email, password })
+      let users = await User.create({ name, surname, email, password })
 
+      users = await transform.item(users, Transformer)
       return response.status(201).send(users)
     } catch (error) {
       return response.status(400).send({
@@ -80,9 +86,11 @@ class UserController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show({ params: { id }, request, response, view }) {
+  async show({ params: { id }, request, response, transform }) {
     try {
-      const users = await User.findOrFail({ id, deleted_at: null })
+      let users = await User.findOrFail({ id, deleted_at: null })
+
+      users = await transform.item(users, Transformer)
       return response.status(200).send(users)
     } catch (error) {
       return response.status(400).send({
@@ -100,10 +108,10 @@ class UserController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update({ params: { id }, request, response }) {
+  async update({ params: { id }, request, response, transform }) {
     try {
       const { name, surname, email, password } = request.all()
-      const user = await User.findOrFail({ id, deleted_at: null })
+      let user = await User.findOrFail({ id, deleted_at: null })
       user.merge({
         name,
         surname,
@@ -111,6 +119,8 @@ class UserController {
         password
       })
       await user.save()
+
+      user = await transform.item(user, Transformer)
       return response.status(200).send(user)
     } catch (error) {
       return response.status(400).send({
@@ -128,13 +138,14 @@ class UserController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy({ params: { id }, request, response }) {
+  async destroy({ params: { id }, transform, response }) {
     try {
-      const user = await User.findOrFail({ id, deleted_at: null })
+      let user = await User.findOrFail({ id, deleted_at: null })
       user.merge({
         deleted_at: new Date()
       })
       await user.save()
+      user = await transform.item(user, Transformer)
       return response.status(200).send(user)
     } catch (error) {
       return response.status(400).send({
