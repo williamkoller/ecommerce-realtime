@@ -2,6 +2,7 @@
 
 const Image = use('App/Models/Image')
 const { manage_single_upload, manage_multiple_uploads } = use('App/Helpers')
+const Transformer = use('App/Transformers/Admin/ImageTransformer')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -20,14 +21,15 @@ class ImageController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async index({ request, response, pagination }) {
-    const image = await Image.query()
-      .whereNull('deleted_at')
+  async index({ request, response, pagination, transform }) {
+    let image = await Image.query()
+      .where('deleted_at', null)
       .orderBy('id', 'DESC')
       .paginate(pagination.page, pagination.limit)
-    if (!image === 0)
+    image = await transform.paginate(image, Transformer)
+    if (image === null)
       return response.status(404).send({ message: 'Not found images' })
-    return response.status(200).send({ data: image })
+    return response.status(200).send(image)
   }
 
   /**
@@ -38,7 +40,7 @@ class ImageController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store({ params: { id }, request, response }) {
+  async store({ params: { id }, request, response, transform }) {
     try {
       const img = await Image.findOrFail({ id, deleted_at: null })
       if (!img) {
@@ -57,7 +59,9 @@ class ImageController {
               extension: file.subtype
             })
 
-            images.push(image)
+            const imageTransformed = await transform.item(image, Transformer)
+
+            images.push(imageTransformed)
             return response.status(201).send({ successes: images, error: {} })
           }
 
@@ -74,7 +78,9 @@ class ImageController {
               original_name: file.clientName,
               extension: file.subtype
             })
-            images.push(image)
+
+            const imageTransformed = await transform.item(image, Transformer)
+            images.push(imageTransformed)
           })
         )
         return response
@@ -98,9 +104,11 @@ class ImageController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show({ params: { id }, request, response, view }) {
+  async show({ params: { id }, request, response, transform }) {
     try {
-      const images = await Image.findOrFail({ id, deleted_at: null })
+      let images = await Image.findOrFail({ id, deleted_at: null })
+
+      images = await transform.item(images, Transformer)
       return response.status(200).send({ data: images })
     } catch (error) {
       return response.status(400).send({
@@ -118,11 +126,12 @@ class ImageController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update({ params: { id }, request, response }) {
+  async update({ params: { id }, request, response, transform }) {
     try {
-      const image = await Image.findOrFail({ id, deleted_at: null })
+      let image = await Image.findOrFail({ id, deleted_at: null })
       image.merge(request.only(['original_name']))
       await image.save()
+      image = await transform.item(image, Transformer)
       return response.status(200).send({ data: image })
     } catch (error) {
       return response.status(400).send({
@@ -140,11 +149,12 @@ class ImageController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy({ params: { id }, request, response }) {
+  async destroy({ params: { id }, transform, response }) {
     try {
-      const image = await Image.findOrFail({ id, deleted_at: null })
+      let image = await Image.findOrFail({ id, deleted_at: null })
       image.merge({ deleted_at: new Date() })
       await image.save()
+      image = await transform.item(image, Transformer)
       return response.status(200).send({ data: image })
     } catch (error) {
       return response.status(400).send({
