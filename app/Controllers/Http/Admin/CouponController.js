@@ -3,6 +3,7 @@
 const Coupon = use('App/Models/Coupon')
 const Database = use('Database')
 const Service = use('App/Services/Coupon/CouponService')
+const Transformer = use('App/Transformers/Admin/CouponTransformer')
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -21,19 +22,22 @@ class CouponController {
    * @param {Response} ctx.response
    * @param {Pagination} pagination
    */
-  async index({ request, response, pagination }) {
+  async index({ request, response, pagination, transform }) {
     try {
       const code = request.input('code')
       if (!code) {
-        const coupons = await Coupon.query()
+        let coupons = await Coupon.query()
           .whereNull('deleted_at')
           .paginate(pagination.page, pagination.limit)
+        coupons = await transform.paginate(coupons, Transformer)
         return response.status(201).send(coupons)
       }
-      const query = await Coupon.query()
+      let query = await Coupon.query()
         .whereNull('deleted_at')
         .where('code', 'ilike', `%${code}%`)
         .paginate()
+
+      query = await transform.paginate(query, Transformer)
       return response.status(201).send(query)
     } catch (error) {
       return response.status(400).send({
@@ -51,7 +55,7 @@ class CouponController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store({ request, response }) {
+  async store({ request, response, transform }) {
     /**
      * 1 - product - can only be used on specific products
      * 2 - clients - can only be used by specific customers
@@ -74,7 +78,7 @@ class CouponController {
         'recursive'
       ])
       const { users, products } = request.only(['users', 'products'])
-      const coupon = await Coupon.create(CouponData, trx)
+      let coupon = await Coupon.create(CouponData, trx)
       // starts service layer
       const service = new Service(coupon, trx)
 
@@ -100,6 +104,8 @@ class CouponController {
 
       await Coupon.save(trx)
       await trx.commit()
+
+      coupon = await transform.item(coupon, Transformer)
       return response.status(201).send(coupon)
     } catch (error) {
       await trx.rollback()
@@ -119,10 +125,11 @@ class CouponController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show({ params: { id }, request, response, view }) {
+  async show({ params: { id }, request, response, transform }) {
     try {
-      const coupon = await Coupon.findOrFail(id)
-      return response.status(200).send(coupon)
+      let coupons = await Coupon.findOrFail(id)
+      coupons = await transform.item(coupons, Transformer)
+      return response.status(200).send(coupons)
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',
@@ -139,10 +146,10 @@ class CouponController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update({ params: { id }, request, response }) {
+  async update({ params: { id }, request, response, transform }) {
     try {
       const trx = await Database.beginTransaction()
-      const coupon = await Coupon.findOrFail(id)
+      let coupon = await Coupon.findOrFail(id)
       const can_user_for = {
         client: false,
         product: false
@@ -185,6 +192,8 @@ class CouponController {
       await coupon.save(trx)
       await trx.commit()
 
+      coupon = await transform.item(coupon, Transformer)
+
       return response.status(200).send(coupon)
     } catch (error) {
       await trx.rollback()
@@ -203,11 +212,13 @@ class CouponController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy({ params: { id }, request, response }) {
+  async destroy({ params: { id }, transform, response }) {
     try {
-      const coupon = await Coupon.findOrFail({ id, deleted_at: null })
+      let coupon = await Coupon.findOrFail({ id, deleted_at: null })
       coupon.merge({ deleted_at: new Date() })
       await coupon.save()
+
+      coupon = await transform.item(coupon, Transformer)
       return response.status(200).send(coupon)
     } catch (error) {
       return response.status(400).send({
