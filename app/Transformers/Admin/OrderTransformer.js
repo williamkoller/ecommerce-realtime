@@ -1,6 +1,10 @@
 'use strict'
 
 const BumblebeeTransformer = use('Bumblebee/Transformer')
+const UserTransformer = use('App/Transformers/Admin/UserTransformer')
+const OrderItemTransformer = use('App/Transformers/Admin/OrderItemTransformer')
+const CouponTransformer = use('App/Transformers/Admin/CouponTransformer')
+const DiscountTransformer = use('App/Transformers/Admin/DiscountTransformer')
 
 /**
  * OrderTransformer class
@@ -32,6 +36,22 @@ class OrderTransformer extends BumblebeeTransformer {
       subtotal:
         order.__meta__ && order.__meta__.subtotal ? order.__meta__.subtotal : 0
     }
+  }
+
+  includeUser(order) {
+    return this.item(order.getRelated('user'), UserTransformer)
+  }
+
+  includeItems(order) {
+    return this.item(order.getRelated('items'), OrderItemTransformer)
+  }
+
+  includeCoupons(order) {
+    return this.item(order.getRelated('coupons'), CouponTransformer)
+  }
+
+  includeDiscount(order) {
+    return this.item(order.getRelated('discounts'), DiscountTransformer)
   }
 }
 
