@@ -23,7 +23,7 @@ class ImageController {
    */
   async index({ request, response, pagination, transform }) {
     let image = await Image.query()
-      .where('deleted_at', null)
+      .whereNull('deleted_at')
       .orderBy('id', 'DESC')
       .paginate(pagination.page, pagination.limit)
     image = await transform.paginate(image, Transformer)
@@ -109,7 +109,7 @@ class ImageController {
       let images = await Image.findOrFail({ id, deleted_at: null })
 
       images = await transform.item(images, Transformer)
-      return response.status(200).send({ data: images })
+      return response.status(200).send(images)
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',
@@ -132,7 +132,7 @@ class ImageController {
       image.merge(request.only(['original_name']))
       await image.save()
       image = await transform.item(image, Transformer)
-      return response.status(200).send({ data: image })
+      return response.status(200).send(image)
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',
@@ -155,7 +155,7 @@ class ImageController {
       image.merge({ deleted_at: new Date() })
       await image.save()
       image = await transform.item(image, Transformer)
-      return response.status(200).send({ data: image })
+      return response.status(200).send(image)
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',

@@ -37,7 +37,7 @@ class OrderController {
 
       const coupons = await query.paginate(pagination.page, pagination.limit)
 
-      return response.status(200).send({ data: coupons })
+      return response.status(200).send(coupons)
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',
@@ -64,7 +64,7 @@ class OrderController {
         await service.syncItems(items)
       }
       await trx.commit()
-      return response.status(201).send({ data: order })
+      return response.status(201).send(order)
     } catch (error) {
       await trx.rollback()
       return response.status(400).send({
@@ -86,7 +86,7 @@ class OrderController {
   async show({ params: { id }, request, response, view }) {
     try {
       const coupons = await Coupon.findOrFail(id)
-      return response.status(200).send({ data: coupons })
+      return response.status(200).send(coupons)
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',
@@ -118,7 +118,7 @@ class OrderController {
       await order.save(trx)
       await trx.commit()
 
-      return response.status(200).send({ data: order })
+      return response.status(200).send(order)
     } catch (error) {
       await trx.rollback()
       return response.status(400).send({
@@ -138,12 +138,12 @@ class OrderController {
    */
   async destroy({ params: { id }, request, response }) {
     try {
-      const coupons = await Coupon.findOrFail({ id, deleted_at: null })
-      coupons.merge({
+      const coupon = await Coupon.findOrFail({ id, deleted_at: null })
+      coupon.merge({
         deleted_at: new Date()
       })
-      await coupons.save()
-      return response.status(200).send({ data: coupons })
+      await coupon.save()
+      return response.status(200).send(coupon)
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',
@@ -211,7 +211,7 @@ class OrderController {
       discount.merge({ deleted_at: new Date() })
       await discount.save()
 
-      return response.status(200).send({ data: discount })
+      return response.status(200).send(discount)
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',

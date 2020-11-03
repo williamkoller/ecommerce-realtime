@@ -70,7 +70,7 @@ class CategoryController {
         image_id
       })
       category = await transform.item(category, Transformer)
-      return response.status(201).send({ data: category })
+      return response.status(201).send(category)
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',
@@ -92,7 +92,7 @@ class CategoryController {
     try {
       let category = await Category.findByOrFail({ id, deleted_at: null })
       category = await transform.item(category, Transformer)
-      return response.status(200).send({ data: category })
+      return response.status(200).send(category)
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',
@@ -120,7 +120,7 @@ class CategoryController {
       })
       await category.save()
       category = await transform.item(category, Transformer)
-      return response.status(200).send({ data: category })
+      return response.status(200).send(category)
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',
@@ -139,15 +139,15 @@ class CategoryController {
    */
   async destroy({ params: { id }, request, response, transform }) {
     try {
-      let categories = await Category.findByOrFail({
+      let category = await Category.findByOrFail({
         id: id,
         deleted_at: null
       })
 
-      categories.merge({ deleted_at: new Date() })
-      await categories.save()
-      categories = await transform.item(categories, Transformer)
-      return response.status(200).send({ data: categories })
+      category.merge({ deleted_at: new Date() })
+      await category.save()
+      category = await transform.item(category, Transformer)
+      return response.status(200).send(category)
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',

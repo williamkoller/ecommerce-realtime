@@ -27,7 +27,7 @@ class AuthController {
       await user.roles().attach([userRole.id], null, trx)
       await trx.commit()
 
-      return response.status(201).send({ data: user })
+      return response.status(201).send(user)
     } catch (error) {
       await trx.rollback()
       response.status(400).send({
@@ -53,7 +53,7 @@ class AuthController {
       .newRefreshToken()
       .generateForRefreshToken(refresh_token)
 
-    return response.send({ data: user })
+    return response.send(user)
   }
 
   async logout({ request, response, auth }) {

@@ -28,13 +28,13 @@ class CouponController {
         const coupons = await Coupon.query()
           .whereNull('deleted_at')
           .paginate(pagination.page, pagination.limit)
-        return response.status(201).send({ data: coupons })
+        return response.status(201).send(coupons)
       }
       const query = await Coupon.query()
         .whereNull('deleted_at')
         .where('code', 'ilike', `%${code}%`)
         .paginate()
-      return response.status(201).send({ data: query })
+      return response.status(201).send(query)
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',
@@ -100,7 +100,7 @@ class CouponController {
 
       await Coupon.save(trx)
       await trx.commit()
-      return response.status(201).send({ data: coupon })
+      return response.status(201).send(coupon)
     } catch (error) {
       await trx.rollback()
       return response.status(400).send({
@@ -122,7 +122,7 @@ class CouponController {
   async show({ params: { id }, request, response, view }) {
     try {
       const coupon = await Coupon.findOrFail(id)
-      return response.status(200).send({ data: coupon })
+      return response.status(200).send(coupon)
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',
@@ -185,7 +185,7 @@ class CouponController {
       await coupon.save(trx)
       await trx.commit()
 
-      return response.status(200).send({ data: coupon })
+      return response.status(200).send(coupon)
     } catch (error) {
       await trx.rollback()
       return response.status(400).send({
@@ -208,7 +208,7 @@ class CouponController {
       const coupon = await Coupon.findOrFail({ id, deleted_at: null })
       coupon.merge({ deleted_at: new Date() })
       await coupon.save()
-      return response.status(200).send({ data: coupon })
+      return response.status(200).send(coupon)
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',

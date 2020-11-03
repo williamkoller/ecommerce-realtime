@@ -62,7 +62,7 @@ class UserController {
           .send({ message: `This user already exists with email` })
       const users = await User.create({ name, surname, email, password })
 
-      return response.status(201).send({ users })
+      return response.status(201).send(users)
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',
@@ -83,7 +83,7 @@ class UserController {
   async show({ params: { id }, request, response, view }) {
     try {
       const users = await User.findOrFail({ id, deleted_at: null })
-      return response.status(200).send({ data: users })
+      return response.status(200).send(users)
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',
@@ -111,7 +111,7 @@ class UserController {
         password
       })
       await user.save()
-      return response.status(200).send({ data: user })
+      return response.status(200).send(user)
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',
@@ -135,7 +135,7 @@ class UserController {
         deleted_at: new Date()
       })
       await user.save()
-      return response.status(200).send({ data: user })
+      return response.status(200).send(user)
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',

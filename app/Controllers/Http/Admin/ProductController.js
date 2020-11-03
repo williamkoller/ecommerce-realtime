@@ -1,7 +1,7 @@
 'use strict'
 
 const Product = use('App/Models/Product')
-
+const Transformer = use('App/Transformers/Admin/ProductTransformer')
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
@@ -19,19 +19,30 @@ class ProductController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async index({ request, response, view, pagination }) {
-    const name = request.input('name')
-    if (!name) {
-      const products = await Product.query()
-        .whereNull('deleted_at')
-        .paginate(pagination.page, pagination.limit)
-      return response.status(200).send({ data: products })
-    }
-    const query = await Product.query()
-      .where('name', 'ilike', `%${name}%`)
-      .paginate()
+  async index({ request, response, transform, pagination }) {
+    try {
+      const name = request.input('name')
+      if (!name) {
+        let products = await Product.query()
+          .whereNull('deleted_at')
+          .paginate(pagination.page, pagination.limit)
 
-    return response.status(200).send({ data: query })
+        products = await transform.paginate(products, Transformer)
+        return response.status(200).send(products)
+      }
+      let query = await Product.query()
+        .where('name', 'ilike', `%${name}%`)
+        .paginate()
+
+      query = await transform.paginate(query, Transformer)
+
+      return response.status(200).send(query)
+    } catch (error) {
+      return response.status(400).send({
+        message: 'this request not performed',
+        error: error.stack
+      })
+    }
   }
 
   /**
@@ -42,16 +53,18 @@ class ProductController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store({ request, response }) {
+  async store({ request, response, transform }) {
     try {
       const { name, image_id, description, price } = request.all()
-      const product = await Product.create({
+      let product = await Product.create({
         name,
         image_id,
         description,
         price
       })
-      return response.status(201).send({ data: product })
+
+      product = await transform.item(product, Transformer)
+      return response.status(201).send(product)
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',
@@ -69,10 +82,12 @@ class ProductController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show({ params: { id }, request, response, view }) {
+  async show({ params: { id }, request, response, transform }) {
     try {
-      const products = await Product.findByOrFail({ id, deleted_at: null })
-      return response.status(200).send({ data: products })
+      let products = await Product.findByOrFail({ id, deleted_at: null })
+
+      products = await transform.item(products, Transformer)
+      return response.status(200).send(products)
     } catch (error) {
       response.status(400).send({
         error: error.message
@@ -88,18 +103,19 @@ class ProductController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update({ params: { id }, request, response }) {
+  async update({ params: { id }, request, response, transform }) {
     try {
-      const products = await Product.findByOrFail({ id, deleted_at: null })
+      let product = await Product.findByOrFail({ id, deleted_at: null })
       const { name, image_id, description, price } = request.all()
-      products.merge({
+      product.merge({
         name,
         image_id,
         description,
         price
       })
-      await products.save()
-      return response.status(200).send({ data: products })
+      await product.save()
+      product = await transform.item(product, Transformer)
+      return response.status(200).send(product)
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',
