@@ -48,6 +48,8 @@ Router.group(() => {
         [['users.update'], ['Admin/StoreUser']]
       ])
     )
+
+  Router.get('dashboard', 'DashboardController.index').as('dashboard')
 })
   .prefix('v1/admin')
   .namespace('Admin')

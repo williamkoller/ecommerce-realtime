@@ -1,6 +1,12 @@
 'use strict'
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
+
+/**
+ *  Return user logged
+ */
+Route.get('v1/me', 'UserController.me').as('me').middleware('auth')
+
 Route.get('/', 'HomeController.index').namespace('Home')
 Route.get('/v1', () => {
   String.prototype.toHHMMSS = function () {
