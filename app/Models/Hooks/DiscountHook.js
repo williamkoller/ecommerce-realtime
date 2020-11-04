@@ -1,7 +1,7 @@
 'use strict'
 
-const Coupon = use('app/models/Coupon')
-const Order = use('app/models/Order')
+const Coupon = use('App/Models/Coupon')
+const Order = use('App/Models/Order')
 const Database = use('Database')
 const DiscountHook = (exports = module.exports = {})
 

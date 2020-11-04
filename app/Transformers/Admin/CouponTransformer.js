@@ -12,10 +12,9 @@ const OrderTransformer = use('App/Transformers/Admin/OrderTransformer')
  * @constructor
  */
 class CouponTransformer extends BumblebeeTransformer {
-  availableInclude() {
+  static get availableIncludes() {
     return ['users', 'products', 'orders']
   }
-
   /**
    * This method is used to transform the data.
    */
@@ -27,11 +26,11 @@ class CouponTransformer extends BumblebeeTransformer {
   }
 
   includeUsers(coupon) {
-    return this.item(coupon.getRelated('users'), UserTransformer)
+    return this.collection(coupon.getRelated('users'), UserTransformer)
   }
 
   includeProducts(coupon) {
-    return this.item(coupon.getRelated('products'), ProductTransformer)
+    return this.collection(coupon.getRelated('products'), ProductTransformer)
   }
 
   includeOrders(coupon) {

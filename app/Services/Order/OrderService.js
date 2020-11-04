@@ -9,9 +9,11 @@ class OrderService {
   }
 
   async syncItems(items) {
-    if (!Array.isArray(items)) return false
+    if (!Array.isArray(items)) {
+      return false
+    }
     await this.model.items().delete(this.trx)
-    await this.modeli.items().createMany(items, this.trx)
+    await this.model.items().createMany(items, this.trx)
   }
 
   async syncUpdateItems(items) {

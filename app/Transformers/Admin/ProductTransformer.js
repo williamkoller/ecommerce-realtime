@@ -19,7 +19,7 @@ class ProductTransformer extends BumblebeeTransformer {
   transform(model) {
     return {
       id: model.id,
-      name: modelname,
+      name: model.name,
       description: model.description,
       price: model.price
     }

@@ -87,7 +87,7 @@ class ProductController {
       let products = await Product.findByOrFail({ id, deleted_at: null })
 
       products = await transform.item(products, Transformer)
-      return response.status(200).send(products)
+      return response.status(200).send({ data: products })
     } catch (error) {
       response.status(400).send({
         error: error.message
@@ -115,7 +115,7 @@ class ProductController {
       })
       await product.save()
       product = await transform.item(product, Transformer)
-      return response.status(200).send(product)
+      return response.status(200).send({ data: product })
     } catch (error) {
       return response.status(400).send({
         message: 'This request not performed',

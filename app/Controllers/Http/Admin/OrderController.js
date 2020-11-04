@@ -59,16 +59,18 @@ class OrderController {
    * @param {Response} ctx.response
    */
   async store({ request, response, transform }) {
+    const trx = await Database.beginTransaction()
     try {
-      const trx = await Database.beginTransaction()
       const { user_id, items, status } = request.all()
-      let order = await Order.create({ user_id, items, status })
+      let order = await Order.create({ user_id, status }, trx)
       const service = new Service(order, trx)
       if (items && items.length > 0) {
         await service.syncItems(items)
       }
       await trx.commit()
-      order = await transform.item(order, Transformer)
+
+      order = await Order.find(order.id)
+      order = await transform.include('user,items').item(order, Transformer)
       return response.status(201).send(order)
     } catch (error) {
       await trx.rollback()

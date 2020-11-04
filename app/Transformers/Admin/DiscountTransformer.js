@@ -10,16 +10,17 @@ const CouponTransformer = use('App/Transformers/Admin/CouponTransformer')
  * @constructor
  */
 class DiscountTransformer extends BumblebeeTransformer {
-  defaultInclude() {
+  static get defaultInclude() {
     return ['coupon']
   }
+
   /**
    * This method is used to transform the data.
    */
   transform(model) {
     return {
       id: model.id,
-      amount: model.amount
+      amount: model.discount
     }
   }
 
