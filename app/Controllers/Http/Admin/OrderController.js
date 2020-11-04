@@ -39,7 +39,9 @@ class OrderController {
 
       let coupons = await query.paginate(pagination.page, pagination.limit)
 
-      coupons = await transform.paginate(coupons, Transformer)
+      coupons = await transform
+        .include('user,items')
+        .paginate(coupons, Transformer)
 
       return response.status(200).send(coupons)
     } catch (error) {
@@ -93,7 +95,9 @@ class OrderController {
   async show({ params: { id }, request, response, transform }) {
     try {
       let orders = await Order.findOrFail(id)
-      orders = await transform.item(orders, Transformer)
+      orders = await transform
+        .include('items,user,discounts')
+        .item(orders, Transformer)
       return response.status(200).send(orders)
     } catch (error) {
       return response.status(400).send({
@@ -126,7 +130,9 @@ class OrderController {
       await order.save(trx)
       await trx.commit()
 
-      order = await transform.item(order, Transformer)
+      order = await transform
+        .include('items,user,discounts, coupons')
+        .item(order, Transformer)
 
       return response.status(200).send(order)
     } catch (error) {
@@ -171,11 +177,11 @@ class OrderController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async applyDiscount({ params: { id }, request, response }) {
+  async applyDiscount({ params: { id }, request, response, transform }) {
     try {
       const { code } = request.all()
       const coupon = await Coupon.findByOrFail('code', code.toUpperCase())
-      const order = await Order.findOrFail(id)
+      let order = await Order.findOrFail(id)
 
       const info = {}
 
@@ -202,6 +208,9 @@ class OrderController {
         info.success = false
       }
 
+      orders = await transform
+        .include('items,user,discounts')
+        .item(orders, Transformer)
       return response.status(200).send({ order, info })
     } catch (error) {
       return response.status(400).send({
