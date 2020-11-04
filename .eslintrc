@@ -22,6 +22,7 @@
     "strict": [0, "global"],
     "no-param-reasssign": "off",
     "consistent-return": "off",
-    "prefer-const": "off"
+    "prefer-const": "off",
+    "no-extend-native": "off"
   }
 }
