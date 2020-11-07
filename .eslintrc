@@ -23,6 +23,7 @@
     "no-param-reasssign": "off",
     "consistent-return": "off",
     "prefer-const": "off",
-    "no-extend-native": "off"
+    "no-extend-native": "off",
+    "no-unused-vars": "off"
   }
 }
