@@ -12,10 +12,12 @@ Router.group(() => {
   /**
    * Orders routes
    */
-  Router.get('orders', 'OrderController.index')
-  Router.get('orders/:id', 'OrderController.show')
+  Router.get('orders', 'OrderController.index').middleware(['auth'])
+  Router.get('orders/:id', 'OrderController.show').middleware(['auth'])
   Router.post('orders', 'OrderController.store')
   Router.put('orders/:id', 'OrderController.update')
+  Router.post('orders/apply-discount', 'OrderController.applyDiscount')
+  Router.delete('orders/destroy-discount', 'OrderController.removeDiscount')
 })
   .prefix('v1')
   .namespace('Client')
