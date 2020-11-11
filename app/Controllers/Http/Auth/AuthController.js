@@ -44,23 +44,32 @@ class AuthController {
     }
   }
   async login({ request, response, auth }) {
-    const { email, password } = request.all()
+    try {
+      const { email, password } = request.all()
 
-    const data = await auth.withRefreshToken().attempt(email, password)
-    return response.send({ data })
+      const data = await auth.withRefreshToken().attempt(email, password)
+      return response.send({ data })
+    } catch (error) {}
   }
 
   async refresh({ request, response, auth }) {
-    let refresh_token = request.input('refresh_token')
-    if (!refresh_token) {
-      refresh_token = request.header('refresh_token')
+    try {
+      let refresh_token = request.input('refresh_token')
+      if (!refresh_token) {
+        refresh_token = request.header('refresh_token')
+      }
+
+      const user = await auth
+        .newRefreshToken()
+        .generateForRefreshToken(refresh_token)
+
+      return response.send({ user })
+    } catch (error) {
+      return response.status(400).send({
+        message: 'This request not performed',
+        error: error.stack
+      })
     }
-
-    const user = await auth
-      .newRefreshToken()
-      .generateForRefreshToken(refresh_token)
-
-    return response.send(user)
   }
 
   async logout({ request, response, auth }) {
@@ -71,7 +80,9 @@ class AuthController {
     }
 
     await auth.authenticator('jwt').revokeTokens([refresh_token], true)
-    return response.status(204).send({})
+    return response.status(200).send({
+      message: 'Logout successfully'
+    })
   }
 
   async forgot({ request, response, auth }) {}
