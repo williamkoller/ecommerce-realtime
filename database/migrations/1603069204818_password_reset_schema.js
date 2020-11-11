@@ -6,10 +6,7 @@ const Schema = use('Schema')
 class PasswordResetSchema extends Schema {
   up() {
     this.create('password_resets', (table) => {
-      table
-        .uuid('id')
-        .unique()
-        .defaultTo(this.db.raw('public.gen_random_uuid()'))
+      table.increments()
 
       table.string('email').notNullable()
       table.string('token').notNullable().unique()

@@ -6,13 +6,10 @@ const Schema = use('Schema')
 class OrderSchema extends Schema {
   up() {
     this.create('orders', (table) => {
-      table
-        .uuid('id')
-        .unique()
-        .defaultTo(this.db.raw('public.gen_random_uuid()'))
+      table.increments()
 
       table.decimal('total', 12, 2).defaultTo(0.0)
-      table.uuid('user_id').unsigned()
+      table.integer('user_id').unsigned()
       table.enu('status', [
         'pending',
         'cancelled',

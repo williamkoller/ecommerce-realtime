@@ -6,10 +6,8 @@ const Schema = use('Schema')
 class ImageSchema extends Schema {
   up() {
     this.create('images', (table) => {
-      table
-        .uuid('id')
-        .unique()
-        .defaultTo(this.db.raw('public.gen_random_uuid()'))
+      table.increments()
+
       table.string('path', 255)
       table.integer('size').unsigned()
       table.string('original_name', 100)

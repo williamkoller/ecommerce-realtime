@@ -13,7 +13,6 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_PORT: ${DB_PORT}
       DB_HOST: ${DB_HOST}
-      DB_DEBUG: ${DB_DEBUG}
 
       NODE_ENV: 'development'
 

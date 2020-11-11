@@ -6,13 +6,10 @@ const Schema = use('Schema')
 class ProductSchema extends Schema {
   up() {
     this.create('products', (table) => {
-      table
-        .uuid('id')
-        .unique()
-        .defaultTo(this.db.raw('public.gen_random_uuid()'))
+      table.increments()
 
       table.string('name', 200)
-      table.uuid('image_id').unsigned()
+      table.integer('image_id').unsigned()
       table.text('description')
       table.decimal('price', 12, 2)
       table.timestamp('created_at', { useTz: true })
@@ -27,8 +24,8 @@ class ProductSchema extends Schema {
 
     this.create('image_product', (table) => {
       table.increments()
-      table.uuid('image_id').unsigned()
-      table.uuid('product_id').unsigned()
+      table.integer('image_id').unsigned()
+      table.integer('product_id').unsigned()
       table
         .foreign('image_id')
         .references('id')
@@ -43,12 +40,10 @@ class ProductSchema extends Schema {
     })
 
     this.create('category_product', (table) => {
-      table
-        .uuid('id')
-        .unique()
-        .defaultTo(this.db.raw('public.gen_random_uuid()'))
-      table.uuid('product_id').unsigned()
-      table.uuid('category_id').unsigned()
+      table.increments()
+
+      table.integer('product_id').unsigned()
+      table.integer('category_id').unsigned()
 
       table
         .foreign('product_id')

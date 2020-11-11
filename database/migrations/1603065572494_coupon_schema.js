@@ -6,10 +6,7 @@ const Schema = use('Schema')
 class CouponSchema extends Schema {
   up() {
     this.create('coupons', (table) => {
-      table
-        .uuid('id')
-        .unique()
-        .defaultTo(this.db.raw('public.gen_random_uuid()'))
+      table.increments()
 
       table.string('code', 100).notNullable()
       table.dateTime('valid_from')

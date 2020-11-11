@@ -6,12 +6,10 @@ const Schema = use('Schema')
 class CouponOrderSchema extends Schema {
   up() {
     this.create('coupon_order', (table) => {
-      table
-        .uuid('id')
-        .unique()
-        .defaultTo(this.db.raw('public.gen_random_uuid()'))
-      table.uuid('coupon_id').unsigned()
-      table.uuid('order_id').unsigned()
+      table.increments()
+
+      table.integer('coupon_id').unsigned()
+      table.integer('order_id').unsigned()
 
       table.decimal('discount', 12, 2).defaultTo(0.0)
 

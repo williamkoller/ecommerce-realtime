@@ -5,17 +5,15 @@ const Schema = use('Schema')
 class RoleUserTableSchema extends Schema {
   up() {
     this.create('role_user', (table) => {
-      table
-        .uuid('id')
-        .unique()
-        .defaultTo(this.db.raw('public.gen_random_uuid()'))
-      table.uuid('role_id').unsigned().index()
+      table.increments()
+
+      table.integer('role_id').unsigned().index()
       table
         .foreign('role_id')
         .references('id')
         .inTable('roles')
         .onDelete('cascade')
-      table.uuid('user_id').unsigned().index()
+      table.integer('user_id').unsigned().index()
       table
         .foreign('user_id')
         .references('id')

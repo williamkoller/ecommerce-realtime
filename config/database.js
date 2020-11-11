@@ -46,6 +46,6 @@ module.exports = {
       propagateCreateError: false
     },
     acquireConnectionTimeout: 10000,
-    debug: Env.get('DB_DEBUG')
+    debug: Env.get('DB_DEBUG', false)
   }
 }

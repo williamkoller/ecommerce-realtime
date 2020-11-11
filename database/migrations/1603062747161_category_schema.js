@@ -6,14 +6,11 @@ const Schema = use('Schema')
 class CategorySchema extends Schema {
   up() {
     this.create('categories', (table) => {
-      table
-        .uuid('id')
-        .unique()
-        .defaultTo(this.db.raw('public.gen_random_uuid()'))
+      table.increments()
 
       table.string('title', 100)
       table.string('description', 255)
-      table.uuid('image_id').unsigned()
+      table.integer('image_id').unsigned()
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
       table.timestamp('deleted_at', { useTz: true })

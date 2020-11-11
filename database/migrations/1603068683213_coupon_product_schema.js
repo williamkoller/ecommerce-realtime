@@ -6,13 +6,10 @@ const Schema = use('Schema')
 class CouponProductSchema extends Schema {
   up() {
     this.create('coupon_product', (table) => {
-      table
-        .uuid('id')
-        .unique()
-        .defaultTo(this.db.raw('public.gen_random_uuid()'))
+      table.increments()
 
-      table.uuid('coupon_id').unsigned()
-      table.uuid('product_id').unsigned()
+      table.integer('coupon_id').unsigned()
+      table.integer('product_id').unsigned()
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
       table.timestamp('deleted_at', { useTz: true })

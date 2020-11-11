@@ -6,15 +6,12 @@ const Schema = use('Schema')
 class OrderItemSchema extends Schema {
   up() {
     this.create('order_items', (table) => {
-      table
-        .uuid('id')
-        .unique()
-        .defaultTo(this.db.raw('public.gen_random_uuid()'))
+      table.increments()
 
-      table.uuid('product_id').unsigned()
+      table.integer('product_id').unsigned()
       table.integer('quantity').unsigned()
       table.decimal('subtotal', 12, 2)
-      table.uuid('order_id').unsigned()
+      table.integer('order_id').unsigned()
 
       table
         .foreign('product_id')

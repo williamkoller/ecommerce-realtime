@@ -6,17 +6,12 @@ const Schema = use('Schema')
 class UserSchema extends Schema {
   up() {
     this.create('users', (table) => {
-      table
-        .uuid('id')
-        .unique()
-        .defaultTo(this.db.raw('public.gen_random_uuid()'))
-      table.string('locale_id').defaultTo('pt-BR').notNullable()
-
+      table.increments()
       table.string('name', 80)
       table.string('surname', 200)
       table.string('email', 254).notNullable().unique()
       table.string('password', 60).notNullable()
-      table.uuid('image_id').unsigned()
+      table.integer('image_id').unsigned()
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
       table.timestamp('deleted_at', { useTz: true })
